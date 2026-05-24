@@ -1,0 +1,4 @@
+build/
+.cache/
+board
+compile_commands.json
