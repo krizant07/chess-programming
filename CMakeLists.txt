@@ -11,6 +11,7 @@ set(SOURCES
     src/game.cpp
     src/piece-list.cpp
     src/move.cpp
+    src/board.cpp
 )
 
 add_executable(board ${SOURCES})

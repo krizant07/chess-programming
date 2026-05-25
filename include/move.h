@@ -1,3 +1,5 @@
+#pragma once
+
 class Move {
 public:
     Move(unsigned int from, unsigned int to, unsigned int flags, unsigned int fromPiece, unsigned int toPiece);

@@ -9,33 +9,14 @@ void PieceList::append(std::byte piece, uint8_t boardIndex) {
     if (m_size >= m_pieceList.size())
         return;
     m_indices[boardIndex] = m_size;
-    m_pieceList[m_size++] = piece;
+    m_pieceList[m_size++] = boardIndex;
 }
 
-void PieceList::debugPrint() {
-    for (int i {0}; i < m_size; ++i) {
-        switch (m_pieceList[i] & std::byte{0x07}) {
-        case constants::PAWN:
-            std::cout << "Pawn ";
-            break;
-        case constants::ROOK:
-            std::cout << "Rook ";
-            break;
-        case constants::KNIGHT:
-            std::cout << "Knight ";
-            break;
-        case constants::BISHOP:
-            std::cout << "Bishop ";
-            break;
-        case constants::QUEEN:
-            std::cout << "Queen ";
-            break;
-        case constants::KING:
-            std::cout << "King ";
-            break;
-        default:
-            std::cout << "Unknown ";
-            break;
-        }
-    }
+uint8_t PieceList::size() {
+    return m_size;
+} 
+
+uint8_t PieceList::operator[] (int i) {
+        return m_pieceList[i]; 
 }
+

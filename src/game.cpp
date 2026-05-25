@@ -15,62 +15,9 @@ Game::Game(std::string_view fenStr) {
 
 void Game::debugPrint() {
     std::cout << "Game Debug:";
-    for(int i {0}; i < m_board.size(); ++i) {
-        if ((i % 10) == 0)
-            std::cout << '\n';
-        switch (m_board[i]) {
-        case constants::SENTINAL:
-            std::cout << "FF ";
-            break;
-        case constants::EMPTY:
-            std::cout << "XX ";
-            break;
 
-        // White pieces
-        case constants::WHITE | constants::PAWN:
-            std::cout << "WP ";
-            break;
-        case constants::WHITE | constants::ROOK:
-            std::cout << "WR ";
-            break;
-        case constants::WHITE | constants::KNIGHT:
-            std::cout << "WN ";
-            break;
-        case constants::WHITE | constants::BISHOP:
-            std::cout << "WB ";
-            break;
-        case constants::WHITE | constants::QUEEN:
-            std::cout << "WQ ";
-            break;
-        case constants::WHITE | constants::KING:
-            std::cout << "WK ";
-            break;
+    m_board.debugPrint();
 
-        // Black pieces
-        case constants::BLACK | constants::PAWN:
-            std::cout << "BP ";
-            break;
-        case constants::BLACK | constants::ROOK:
-            std::cout << "BR ";
-            break;
-        case constants::BLACK | constants::KNIGHT:
-            std::cout << "BN ";
-            break;
-        case constants::BLACK | constants::BISHOP:
-            std::cout << "BB ";
-            break;
-        case constants::BLACK | constants::QUEEN:
-            std::cout << "BQ ";
-            break;
-        case constants::BLACK | constants::KING:
-            std::cout << "BK ";
-            break;
-
-        default:
-            std::cout << "?? ";
-            break;
-        }
-    }
     std::cout << '\n' << (m_whiteTurn ? "WHITE" : "BLACK") << " TURN\n";
     std::cout << "CAN CASTLE KQkq: " << m_canCastleKQkq << '\n';
     std::cout << "EN PASSANT SQUARE INDEX: ";
@@ -81,18 +28,10 @@ void Game::debugPrint() {
     std::cout << '\n';
     std::cout << "HALF MOVE CLOCK: " << m_halfMoveClock << '\n';
     std::cout << "FULL MOVE COUNT: " << m_fullMoveCount << '\n';
-    
-    std::cout << "WHITE LIST: \n";
-    m_whiteList.debugPrint();
-    std::cout << "\nBLACK LIST: \n";
-    m_blackList.debugPrint();
-    std::cout << '\n';
 }
 
 int Game::populateBoard(std::string_view fenStr) {
     using constants::board64;
-    for(auto i : board64)
-        m_board[i] = constants::EMPTY;
 
     int fenIndex { 0 };
     int boardIndex {};
@@ -119,7 +58,6 @@ int Game::populateBoard(std::string_view fenStr) {
     }
     return fenIndex+1;
 }
-
 
 void Game::setWhiteTurn(std::string_view fenStr, int& fenIndex) {
     if (fenStr.size() <= fenIndex) {
@@ -212,9 +150,75 @@ int Game::extractInt(std::string_view fenStr, int& fenIndex) {
 
     return ans;
 }
-
 std::vector<Move> Game::generatePseudoLegal() {
     std::vector<Move> moves {};
+
+    for (int i {0}; i < m_whiteList.size(); ++i) {
+        uint8_t initialSquare { constants::board64[m_whiteList[i]] };
+        uint8_t pieceInt { static_cast<uint8_t>(m_board[initialSquare] & std::byte{0x07}) };
+
+        if (m_board.isPieceAtIndex(constants::PAWN, initialSquare)) {
+            if (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, initialSquare + 10)) { 
+                if ((constants::board64[7] < initialSquare) && 
+                    (initialSquare < constants::board64[16]) && 
+                    m_board.isPieceAtIndex(constants::EMPTY_SQUARE, initialSquare + 20)) {
+                    
+                    moves.emplace_back(
+                        static_cast<unsigned int>(initialSquare),
+                        static_cast<unsigned int>(initialSquare + 20),
+                        0b0001,
+                        static_cast<unsigned int>(m_board[initialSquare]),
+                        static_cast<unsigned int>(constants::EMPTY_SQUARE)
+                    );
+                } 
+                moves.emplace_back(
+                    static_cast<unsigned int>(initialSquare),
+                    static_cast<unsigned int>(initialSquare + 10),
+                    0,
+                    static_cast<unsigned int>(m_board[initialSquare]),
+                    static_cast<unsigned int>(constants::EMPTY_SQUARE)
+                );
+            }
+            if (m_board.isPieceOfColorAtIndex(constants::BLACK, initialSquare + 9)) {
+                
+            }
+            if (m_board.isPieceOfColorAtIndex(constants::BLACK, initialSquare + 11)) {}
+            //do pawn stuff
+            continue;
+        }
+
+        for (int j {0}; j < constants::offset_count[pieceInt]; ++j) {
+            for (int move { initialSquare } ;;) {
+                move += constants::offsets[pieceInt][j];
+                if (m_board.isPieceAtIndex(constants::SENTINAL, move))
+                    break;
+                if (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, move)) {
+                    moves.emplace_back(
+                        static_cast<unsigned int>(initialSquare),
+                        static_cast<unsigned int>(move),
+                        0,
+                        static_cast<unsigned int>(m_board[initialSquare]),
+                        static_cast<unsigned int>(constants::EMPTY_SQUARE)
+                    );
+                } else {
+                    if (m_board.isColorAtIndex(constants::WHITE, move))
+                        break;
+                    moves.emplace_back(
+                        static_cast<unsigned int>(initialSquare),
+                        static_cast<unsigned int>(move),
+                        static_cast<unsigned int>(0b0100),
+                        static_cast<unsigned int>(m_board[initialSquare]),
+                        static_cast<unsigned int>(m_board[move])
+                    );
+                    break;
+                }
+
+                if (!constants::slide[pieceInt])
+                   break; 
+            }
+        }
+        
+    }
 
 
 

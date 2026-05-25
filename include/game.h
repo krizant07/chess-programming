@@ -1,7 +1,10 @@
+#pragma once
+
 #include <string_view>
 #include <bitset>
 #include <vector>
 
+#include "board.h"
 #include "constants.h"
 #include "piece-list.h"
 #include "move.h"
@@ -20,11 +23,11 @@ public:
         case 'b': return constants::BISHOP;
         case 'q': return constants::QUEEN;
         case 'k': return constants::KING;
-        default: return constants::EMPTY;
+        default: return constants::EMPTY_SQUARE;
         }
     }
 private:
-    BoardArray m_board { constants::empty_board };
+    Board m_board {};
     bool m_whiteTurn { false };
     std::bitset<4> m_canCastleKQkq {};
     int m_enPassant { -1 };
