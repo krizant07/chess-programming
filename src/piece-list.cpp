@@ -12,11 +12,15 @@ void PieceList::append(std::byte piece, uint8_t boardIndex) {
     m_pieceList[m_size++] = boardIndex;
 }
 
-uint8_t PieceList::size() {
+uint8_t PieceList::size() const {
     return m_size;
+}
+
+uint8_t PieceList::capacity() const {
+    return m_pieceList.size();
 } 
 
-uint8_t PieceList::operator[] (int i) {
+uint8_t PieceList::operator[] (int i) const {
         return m_pieceList[i]; 
 }
 
