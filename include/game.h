@@ -6,6 +6,7 @@
 #include "board.h"
 #include "piece-list.h"
 #include "move.h"
+#include "move-list.h"
 
 class Game {
 public:
@@ -25,5 +26,5 @@ private:
     PieceList m_whiteList {};
     PieceList m_blackList {};
 
-    std::vector<Move> generatePseudoLegal();
+    MoveList generatePseudoLegal();
 };

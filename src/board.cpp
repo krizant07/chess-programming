@@ -9,7 +9,7 @@ Board::Board() {
 }
 
 bool Board::isPieceAtIndex(std::byte piece, uint8_t index) const {
-    return (m_board[index] & std::byte{0x07}) == piece;
+    return (m_board[index] & std::byte{0x07}) == (piece & std::byte{0x07});
 }
 
 bool Board::isColorAtIndex(std::byte color, uint8_t index) const {
@@ -20,6 +20,13 @@ bool Board::isPieceOfColorAtIndex(std::byte color, uint8_t index) const {
     return (!isPieceAtIndex(constants::EMPTY_SQUARE, index) && 
             !isPieceAtIndex(constants::SENTINAL, index) && 
             isColorAtIndex(color, index));
+}
+
+bool Board::isAtPawnHomeRankOfColor(std::byte color, uint8_t index) const {
+    if (color == constants::WHITE)
+        return (constants::board64[7] < index) && (index < constants::board64[16]);
+    else
+        return (constants::board64[47] < index) && (index < constants::board64[56]);
 }
 
 std::byte& Board::operator[](uint8_t i) {

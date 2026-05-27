@@ -1,6 +1,11 @@
 #include <cassert>
+#include <iostream>
 
 #include "fen-parser.h"
+
+std::ostream& operator<<(std::ostream& os, std::byte b) {
+    return os << std::bitset<8>(std::to_integer<int>(b));
+}
 
 void FenParser::setup(Game& game, std::string_view fenStr) {
     m_fenIndex = 0;
@@ -18,7 +23,6 @@ FenParser::FenParser() {};
 void FenParser::populateBoard(Game& game) {
     int boardIndex {};
     for(int i { 0 }; i < constants::board64.size(); ++m_fenIndex) {
-        std::byte& square { game.m_board[constants::board64[i]] };
         char c { m_fenStr[m_fenIndex] };
         if (c == '/')
             continue;
@@ -26,11 +30,12 @@ void FenParser::populateBoard(Game& game) {
             i += c - '0';
             continue;
         }
-
         boardIndex = i ^ 56;    // fen string stores pieces with Big endian ranks and Little endian file - Ex:  a8 b8 c8 ... a7 b7 ... g1 h1
                                 // The board is stored as little endian ranks and files.                 - Ex:  a1 b1 c1 ... a2 b2 ... g8 h8
                                 // https://www.chessprogramming.org/Square_Mapping_Considerations#Endianness
                                 // squareIndexLittleEndianRank = squareIndexBigEndianRank    ^ 56;
+
+        std::byte& square { game.m_board[constants::board64[boardIndex]] };
         square = charToPiece(c);
         if (islower(c)) {
             square |= constants::BLACK;

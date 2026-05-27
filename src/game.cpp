@@ -3,6 +3,7 @@
 
 #include "game.h"
 #include "constants.h"
+#include "move-list.h"
 
 Game::Game() {}
 
@@ -21,79 +22,85 @@ void Game::debugPrint() {
     std::cout << '\n';
     std::cout << "HALF MOVE CLOCK: " << m_halfMoveClock << '\n';
     std::cout << "FULL MOVE COUNT: " << m_fullMoveCount << '\n';
+
+    MoveList list = generatePseudoLegal();
+    std::cout << "MOVE LIST SIZE: " << list.size() << '\n';
 }
 
-std::vector<Move> Game::generatePseudoLegal() {
-    std::vector<Move> moves {};
+MoveList Game::generatePseudoLegal() {
+    MoveList moves {};
 
     for (int i {0}; i < m_whiteList.size(); ++i) {
         uint8_t initialSquare { constants::board64[m_whiteList[i]] };
         uint8_t pieceInt { static_cast<uint8_t>(m_board[initialSquare] & std::byte{0x07}) };
 
         if (m_board.isPieceAtIndex(constants::PAWN, initialSquare)) {
-            if (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, initialSquare + 10)) { 
-                if ((constants::board64[7] < initialSquare) && 
-                    (initialSquare < constants::board64[16]) && 
-                    m_board.isPieceAtIndex(constants::EMPTY_SQUARE, initialSquare + 20)) {
-                    
-                    moves.emplace_back(
-                        static_cast<unsigned int>(initialSquare),
-                        static_cast<unsigned int>(initialSquare + 20),
-                        0b0001,
-                        static_cast<unsigned int>(m_board[initialSquare]),
-                        static_cast<unsigned int>(constants::EMPTY_SQUARE)
-                    );
-                } 
-                moves.emplace_back(
-                    static_cast<unsigned int>(initialSquare),
-                    static_cast<unsigned int>(initialSquare + 10),
-                    0,
-                    static_cast<unsigned int>(m_board[initialSquare]),
-                    static_cast<unsigned int>(constants::EMPTY_SQUARE)
-                );
+            if (m_board.isAtPawnHomeRankOfColor(constants::BLACK, initialSquare)) { // is promotable
+                if (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, initialSquare + 10)) {
+                    moves.appendMove(constants::PAWN, initialSquare, 10, 0b1000);
+                    moves.appendMove(constants::PAWN, initialSquare, 10, 0b1001);
+                    moves.appendMove(constants::PAWN, initialSquare, 10, 0b1010);
+                    moves.appendMove(constants::PAWN, initialSquare, 10, 0b1011);
+                }
+                if (m_board.isPieceOfColorAtIndex(constants::BLACK, initialSquare + 9)) {
+                    moves.appendCapture(constants::PAWN, m_board[initialSquare + 9], initialSquare, 9, 0b1100);
+                    moves.appendCapture(constants::PAWN, m_board[initialSquare + 9], initialSquare, 9, 0b1101);
+                    moves.appendCapture(constants::PAWN, m_board[initialSquare + 9], initialSquare, 9, 0b1110);
+                    moves.appendCapture(constants::PAWN, m_board[initialSquare + 9], initialSquare, 9, 0b1111);
+                }
+                if (m_board.isPieceOfColorAtIndex(constants::BLACK, initialSquare + 11)) {
+                    moves.appendCapture(constants::PAWN, m_board[initialSquare + 11], initialSquare, 11, 0b1100);
+                    moves.appendCapture(constants::PAWN, m_board[initialSquare + 11], initialSquare, 11, 0b1101);
+                    moves.appendCapture(constants::PAWN, m_board[initialSquare + 11], initialSquare, 11, 0b1110);
+                    moves.appendCapture(constants::PAWN, m_board[initialSquare + 11], initialSquare, 11, 0b1111);
+                }
+
+                continue; // There should be no more legal moves for a pawn if its promotable
+            }
+            if (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, initialSquare + 10)) {
+                moves.appendMove(constants::PAWN, initialSquare, 10);
+                if (m_board.isAtPawnHomeRankOfColor(constants::WHITE, initialSquare)) {
+                    moves.appendMove(constants::PAWN, initialSquare, 10, 0b0001);
+                }
             }
             if (m_board.isPieceOfColorAtIndex(constants::BLACK, initialSquare + 9)) {
-                
+                moves.appendCapture(constants::PAWN, m_board[initialSquare + 9], initialSquare, 9);    
             }
-            if (m_board.isPieceOfColorAtIndex(constants::BLACK, initialSquare + 11)) {}
-            //do pawn stuff
+            if (m_board.isPieceOfColorAtIndex(constants::BLACK, initialSquare + 11)) {
+                moves.appendCapture(constants::PAWN, m_board[initialSquare + 11], initialSquare, 11);
+            }
+            if (m_enPassant == -1)
+                continue;
+            
+            if (constants::board64[m_enPassant] == (initialSquare + 9)) {
+                moves.appendCapture(constants::PAWN, m_board[initialSquare + 9], initialSquare, 9, 0b0101);
+                continue;
+            }
+            if (constants::board64[m_enPassant] == (initialSquare + 11))
+                moves.appendCapture(constants::PAWN, m_board[initialSquare + 11], initialSquare, 11, 0b0101);
             continue;
         }
 
         for (int j {0}; j < constants::offset_count[pieceInt]; ++j) {
-            for (int move { initialSquare } ;;) {
-                move += constants::offsets[pieceInt][j];
-                if (m_board.isPieceAtIndex(constants::SENTINAL, move))
-                    break;
-                if (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, move)) {
-                    moves.emplace_back(
-                        static_cast<unsigned int>(initialSquare),
-                        static_cast<unsigned int>(move),
-                        0,
-                        static_cast<unsigned int>(m_board[initialSquare]),
-                        static_cast<unsigned int>(constants::EMPTY_SQUARE)
-                    );
-                } else {
-                    if (m_board.isColorAtIndex(constants::WHITE, move))
-                        break;
-                    moves.emplace_back(
-                        static_cast<unsigned int>(initialSquare),
-                        static_cast<unsigned int>(move),
-                        static_cast<unsigned int>(0b0100),
-                        static_cast<unsigned int>(m_board[initialSquare]),
-                        static_cast<unsigned int>(m_board[move])
-                    );
+            for(int moveOffset { constants::offsets[pieceInt][j] }, move { initialSquare } ;;) {
+                move += moveOffset;
+                if (m_board.isPieceAtIndex(constants::SENTINAL, move)) {
                     break;
                 }
-
+                if (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, move)) {
+                    moves.appendMove(m_board[initialSquare], initialSquare, moveOffset);
+                } else {
+                    if (m_board.isColorAtIndex(constants::WHITE, move)) {
+                        break;
+                    }
+                    moves.appendCapture(m_board[initialSquare], m_board[move], initialSquare, moveOffset);
+                    break;
+                }
                 if (!constants::slide[pieceInt])
                    break; 
             }
         }
         
     }
-
-
-
     return moves;
 }

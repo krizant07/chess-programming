@@ -11,6 +11,7 @@ public:
     bool isPieceAtIndex(std::byte, uint8_t) const;
     bool isColorAtIndex(std::byte, uint8_t) const;
     bool isPieceOfColorAtIndex(std::byte, uint8_t) const;
+    bool isAtPawnHomeRankOfColor(std::byte, uint8_t) const;
 
     std::byte& operator[](uint8_t);
 
