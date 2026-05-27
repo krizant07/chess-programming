@@ -1,11 +1,9 @@
 #pragma once
 
 #include <bitset>
-#include <vector>
 
 #include "board.h"
 #include "piece-list.h"
-#include "move.h"
 #include "move-list.h"
 
 class Game {
@@ -26,5 +24,6 @@ private:
     PieceList m_whiteList {};
     PieceList m_blackList {};
 
+    void generatePseudoLegalPawnMoves(MoveList&, std::byte, std::byte, uint8_t);
     MoveList generatePseudoLegal();
 };
