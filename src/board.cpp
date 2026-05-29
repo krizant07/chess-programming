@@ -4,87 +4,60 @@
 #include "constants.h"
 
 Board::Board() {
-    for(auto i : constants::board64)
-        m_board[i] = constants::EMPTY_SQUARE;
+  for (auto i : constants::board64)
+    m_board[i] = constants::EMPTY_SQUARE;
 }
 
 bool Board::isPieceAtIndex(std::byte piece, uint8_t index) const {
-    return (m_board[index] & std::byte{0x07}) == (piece & std::byte{0x07});
+  return (m_board[index] & std::byte{0x07}) == (piece & std::byte{0x07});
 }
 
 bool Board::isColorAtIndex(std::byte color, uint8_t index) const {
-    return (m_board[index] & std::byte{0x80}) == color;
+  return (m_board[index] & std::byte{0x80}) == color;
 }
 
 bool Board::isPieceOfColorAtIndex(std::byte color, uint8_t index) const {
-    return (!isPieceAtIndex(constants::EMPTY_SQUARE, index) && 
-            !isPieceAtIndex(constants::SENTINAL, index) && 
-            isColorAtIndex(color, index));
+  return (!isPieceAtIndex(constants::EMPTY_SQUARE, index) && !isPieceAtIndex(constants::SENTINAL, index) &&
+          isColorAtIndex(color, index));
 }
 
 bool Board::isAtPawnHomeRankOfColor(std::byte color, uint8_t index) const {
-    if (color == constants::WHITE)
-        return (constants::board64[7] < index) && (index < constants::board64[16]);
-    else
-        return (constants::board64[47] < index) && (index < constants::board64[56]);
+  if (color == constants::WHITE)
+    return (constants::board64[7] < index) && (index < constants::board64[16]);
+  else
+    return (constants::board64[47] < index) && (index < constants::board64[56]);
 }
 
 std::byte& Board::operator[](uint8_t i) {
-    return m_board[i];
+  return m_board[i];
+}
+
+std::byte Board::at(uint8_t i) const {
+  return m_board[i];
 }
 
 void Board::debugPrint() const {
-    for(int i {0}; i < m_board.size(); ++i) {
-        if ((i % 10) == 0)
-            std::cout << '\n';
-        switch (m_board[i]) {
-        case constants::SENTINAL:
-            std::cout << "FF ";
-            break;
-        case constants::EMPTY_SQUARE:
-            std::cout << "XX ";
-            break;
-        // White pieces
-        case constants::WHITE | constants::PAWN:
-            std::cout << "WP ";
-            break;
-        case constants::WHITE | constants::ROOK:
-            std::cout << "WR ";
-            break;
-        case constants::WHITE | constants::KNIGHT:
-            std::cout << "WN ";
-            break;
-        case constants::WHITE | constants::BISHOP:
-            std::cout << "WB ";
-            break;
-        case constants::WHITE | constants::QUEEN:
-            std::cout << "WQ ";
-            break;
-        case constants::WHITE | constants::KING:
-            std::cout << "WK ";
-            break;
-        // Black pieces
-        case constants::BLACK | constants::PAWN:
-            std::cout << "BP ";
-            break;
-        case constants::BLACK | constants::ROOK:
-            std::cout << "BR ";
-            break;
-        case constants::BLACK | constants::KNIGHT:
-            std::cout << "BN ";
-            break;
-        case constants::BLACK | constants::BISHOP:
-            std::cout << "BB ";
-            break;
-        case constants::BLACK | constants::QUEEN:
-            std::cout << "BQ ";
-            break;
-        case constants::BLACK | constants::KING:
-            std::cout << "BK ";
-            break;
-        default:
-            std::cout << "?? ";
-            break;
-        }
+  for (int i{0}; i < m_board.size(); ++i) {
+    if ((i % 10) == 0)
+      std::cout << '\n';
+    switch (m_board[i]) {
+    case constants::SENTINAL: std::cout << "FF "; break;
+    case constants::EMPTY_SQUARE: std::cout << "XX "; break;
+    // White pieces
+    case constants::WHITE | constants::PAWN: std::cout << "WP "; break;
+    case constants::WHITE | constants::ROOK: std::cout << "WR "; break;
+    case constants::WHITE | constants::KNIGHT: std::cout << "WN "; break;
+    case constants::WHITE | constants::BISHOP: std::cout << "WB "; break;
+    case constants::WHITE | constants::QUEEN: std::cout << "WQ "; break;
+    case constants::WHITE | constants::KING: std::cout << "WK "; break;
+    // Black pieces
+    case constants::BLACK | constants::PAWN: std::cout << "BP "; break;
+    case constants::BLACK | constants::ROOK: std::cout << "BR "; break;
+    case constants::BLACK | constants::KNIGHT: std::cout << "BN "; break;
+    case constants::BLACK | constants::BISHOP: std::cout << "BB "; break;
+    case constants::BLACK | constants::QUEEN: std::cout << "BQ "; break;
+    case constants::BLACK | constants::KING: std::cout << "BK "; break;
+    default: std::cout << "?? "; break;
     }
+  }
 }

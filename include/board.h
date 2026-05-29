@@ -4,20 +4,21 @@
 
 class Board {
 public:
-    Board();
+  Board();
 
-    int populate(std::string_view);
+  int populate(std::string_view);
 
-    bool isPieceAtIndex(std::byte, uint8_t) const;
-    bool isColorAtIndex(std::byte, uint8_t) const;
-    bool isPieceOfColorAtIndex(std::byte, uint8_t) const;
-    bool isAtPawnHomeRankOfColor(std::byte, uint8_t) const;
+  bool isPieceAtIndex(std::byte, uint8_t) const;
+  bool isColorAtIndex(std::byte, uint8_t) const;
+  bool isPieceOfColorAtIndex(std::byte, uint8_t) const;
+  bool isAtPawnHomeRankOfColor(std::byte, uint8_t) const;
 
-    std::byte& operator[](uint8_t);
+  std::byte& operator[](uint8_t);
 
-    void debugPrint() const;
+  std::byte at(uint8_t) const;
+
+  void debugPrint() const;
 
 private:
-    BoardArray m_board { constants::sentinal_board };
-
+  BoardArray m_board{constants::sentinal_board};
 };
