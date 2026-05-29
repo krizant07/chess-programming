@@ -108,6 +108,22 @@ void Game::generatePseudoLegalPawnMoves(MoveList& moves, std::byte color, std::b
   }
 }
 
+void Game::handleCastleGeneration(MoveList& moves, uint8_t rookPosition, uint8_t kingPosition) const {
+  if (kingPosition == E1) {
+    if (rookPosition == H1 && m_canCastleKQkq[0]) {
+      moves.appendMove(constants::KING, 2, 0b0010);
+    } else if (rookPosition == A1 && m_canCastleKQkq[1]) {
+      moves.appendMove(constants::KING, -2, 0b0011);
+    }
+  } else if (kingPosition == E8) {
+    if (rookPosition == H8 && m_canCastleKQkq[2]) {
+      moves.appendMove(constants::KING, 2, 0b0010);
+    } else if (rookPosition == A8 && m_canCastleKQkq[3]) {
+      moves.appendMove(constants::KING, -2, 0b0011);
+    }
+  }
+}
+
 MoveList Game::generatePseudoLegal() const {
   MoveList moves{};
   const PieceList& list{m_whiteTurn ? m_whiteList : m_blackList};
@@ -133,6 +149,11 @@ MoveList Game::generatePseudoLegal() const {
           appendMoveHelper(moves, initialSquare, moveOffset);
         } else {
           if (m_board.isColorAtIndex(color, move)) {
+            if (m_board.isPieceAtIndex(constants::KING, move)) {
+              if (m_board.isPieceAtIndex(constants::ROOK, initialSquare)) {
+                handleCastleGeneration(moves, initialSquare, move);
+              }
+            }
             break;
           }
           appendCaptureHelper(moves, initialSquare, moveOffset);

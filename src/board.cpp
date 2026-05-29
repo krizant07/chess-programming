@@ -23,9 +23,9 @@ bool Board::isPieceOfColorAtIndex(std::byte color, uint8_t index) const {
 
 bool Board::isAtPawnHomeRankOfColor(std::byte color, uint8_t index) const {
   if (color == constants::WHITE)
-    return (constants::board64[7] < index) && (index < constants::board64[16]);
+    return (constants::board64[H1] < index) && (index < constants::board64[A3]);
   else
-    return (constants::board64[47] < index) && (index < constants::board64[56]);
+    return (constants::board64[H6] < index) && (index < constants::board64[A8]);
 }
 
 std::byte& Board::operator[](uint8_t i) {

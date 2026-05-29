@@ -30,6 +30,7 @@ private:
   void appendPawnPromotion(MoveList&, uint8_t, int8_t) const;
   void appendPawnPromotionCapture(MoveList&, uint8_t, int8_t) const;
   void generatePseudoLegalPawnMoves(MoveList&, std::byte, std::byte, uint8_t) const;
+  void handleCastleGeneration(MoveList&, uint8_t, uint8_t) const;
   MoveList generatePseudoLegal() const;
 
   void makeMove(Move);

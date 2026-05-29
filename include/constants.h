@@ -1,11 +1,12 @@
 #pragma once
 
-#include <array>
 #include <bitset>
 #include <cstdint>
 #include <string_view>
 
-/* 
+#include "types.h"
+
+/*
  * bit 7
  * WHITE  0
  * BLACK  1
@@ -35,8 +36,7 @@
      a8                   h8
 */
 
-using BoardArray = std::array<std::byte, 120>;
-
+// clang-format off
 namespace constants {
 inline constexpr std::byte KNIGHT       { 0b0000'0000 };
 inline constexpr std::byte BISHOP       { 0b0000'0001 };
@@ -69,6 +69,8 @@ inline constexpr std::array<std::array<int8_t, 8>, 5> offsets = {{
     { -11, -10, -9, -1, 1,  9, 10, 11 }, /* QUEEN */
     { -11, -10, -9, -1, 1,  9, 10, 11 }  /* KING */
 }};
+
+//clang-format on
 
 inline constexpr BoardArray make_board(std::byte value) {
     BoardArray a{};
