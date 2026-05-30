@@ -65,9 +65,9 @@ void Game::makeMove(Move move) {
 
   if (flags == 1) { // double pawn push
     if (color == pieces::WHITE) {
-      m_enPassant = from - 10;
-    } else {
       m_enPassant = from + 10;
+    } else {
+      m_enPassant = from - 10;
     }
     return;
   } else {
