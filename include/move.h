@@ -16,9 +16,9 @@ public:
 private:
                           //                   FROM
                           //   UNUSED          PIECE CODE
-                          //   |__________|    |_|
+                          //   |_______|    |__|
   unsigned int m_data{};  // 0b0000'0000'0000'0000'0000'0000'0000'0000
-                          //               |__|    |__| |_____||_____|
+                          //            |__|    |___||_______||______|
                           //               TO      flags  to    from
                           //               PIECE
                           //               CODE

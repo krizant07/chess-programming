@@ -38,6 +38,20 @@ MoveList Game::debugPrint() const {
   return list;
 }
 
+void Game::printList(std::byte color) const {
+  std::cout << ((color == pieces::WHITE) ? "White" : "Black") << " List:\n";
+  std::cout << "Black List:\n";
+  const PieceList& list{color == pieces::WHITE ? m_whiteList : m_blackList};
+  for (int i{0}; i < list.size(); ++i) {
+    int8_t index{list[i]};
+    if (index == -1)
+      break;
+
+    pieces::print(m_board.at(index) | pieces::BLACK);
+    std::cout << "at " << int(index) << '\n';
+  }
+}
+
 void Game::makeMove(Move move) {
   std::byte color{m_whiteTurn ? pieces::WHITE : pieces::BLACK};
   std::byte enemy{m_whiteTurn ? pieces::BLACK : pieces::WHITE};
@@ -58,6 +72,12 @@ void Game::makeMove(Move move) {
   enemyList.remove(to);
 
   m_whiteTurn = !m_whiteTurn;
+
+  if (fromPiece == pieces::PAWN) {
+    m_halfMoveClock = 0;
+  } else {
+    ++m_halfMoveClock;
+  }
 
   if (m_whiteTurn) { // Increment when it becomes whites turn
     ++m_fullMoveCount;
@@ -127,14 +147,9 @@ void Game::appendPawnPromotionCapture(MoveList& moves, uint8_t from, int8_t offs
 
 void Game::generatePseudoLegalPawnMoves(MoveList& moves, std::byte color, std::byte enemy,
                                         uint8_t initialSquare) const {
-  int frontOffset{10};
-  int captureLeftOffset{11};
-  int captureRightOffset{9};
-  if (color == pieces::BLACK) {
-    frontOffset *= -1;
-    captureLeftOffset *= -1;
-    captureRightOffset *= -1;
-  }
+  int frontOffset{color == pieces::WHITE ? 10 : -10};
+  int captureLeftOffset{color == pieces::WHITE ? 11 : -11};
+  int captureRightOffset{color == pieces::WHITE ? 9 : -9};
   if (m_board.isAtPawnHomeRankOfColor(enemy, initialSquare)) { // is promotable
 
     if (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, initialSquare + frontOffset)) {
@@ -174,12 +189,12 @@ void Game::generatePseudoLegalPawnMoves(MoveList& moves, std::byte color, std::b
     return;
   }
 
-  if (constants::board64[m_enPassant] == (initialSquare + captureRightOffset)) {
+  if (m_enPassant == (initialSquare + captureRightOffset)) {
     moves.appendCapture(pieces::PAWN, pieces::PAWN, initialSquare, captureRightOffset, 0b0101);
     return;
   }
 
-  if (constants::board64[m_enPassant] == (initialSquare + captureLeftOffset)) {
+  if (m_enPassant == (initialSquare + captureLeftOffset)) {
     moves.appendCapture(pieces::PAWN, pieces::PAWN, initialSquare, captureLeftOffset, 0b0101);
   }
 }

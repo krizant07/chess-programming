@@ -27,6 +27,8 @@ private:
   PieceList m_whiteList{};
   PieceList m_blackList{};
 
+  void printList(std::byte) const;
+
   void appendMoveHelper(MoveList&, uint8_t, int8_t,
                         uint8_t = 0b0000) const;         // Ts all needs to be in a move generator class.
   void appendCaptureHelper(MoveList&, uint8_t, int8_t, uint8_t = 0b0100) const;
