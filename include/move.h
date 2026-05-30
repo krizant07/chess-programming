@@ -7,11 +7,11 @@ class Move {
 public:
   Move(uint8_t from, uint8_t to, uint8_t flags, uint8_t fromPiece, uint8_t toPiece);
 
-  uint8_t getFrom() const;
-  uint8_t getTo() const;
-  uint8_t getFlags() const;
-  std::byte getFromPiece() const;
-  std::byte getToPiece() const;
+  uint8_t from() const;
+  uint8_t to() const;
+  uint8_t flags() const;
+  std::byte fromPiece() const;
+  std::byte toPiece() const;
 
 private:
                           //                   FROM

@@ -5,22 +5,22 @@ Move::Move(uint8_t from, uint8_t to, uint8_t flags, uint8_t fromPiece, uint8_t t
     : m_data{((toPiece & 7u) << 19) | ((fromPiece & 7u) << 16) | ((flags & 15u) << 12) | ((to & 63u) << 6) |
              (from & 63u)} {}
 
-uint8_t Move::getFrom() const {
+uint8_t Move::from() const {
   return (m_data & 63u);
 }
 
-uint8_t Move::getTo() const {
+uint8_t Move::to() const {
   return ((m_data >> 6) & 63u);
 }
 
-uint8_t Move::getFlags() const {
+uint8_t Move::flags() const {
   return ((m_data >> 12) & 15u);
 }
 
-std::byte Move::getFromPiece() const {
+std::byte Move::fromPiece() const {
   return pieces::codeToPiece((m_data >> 16) & 7u);
 }
 
-std::byte Move::getToPiece() const {
+std::byte Move::toPiece() const {
   return pieces::codeToPiece((m_data >> 19) & 7u);
 }

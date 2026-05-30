@@ -21,7 +21,8 @@ void FenParser::setup(Game& game, std::string_view fenStr) {
 FenParser::FenParser() {};
 
 void FenParser::populateBoard(Game& game) {
-  int boardIndex{};
+  int8_t board64Index{};
+  int8_t boardIndex{};
   for (int i{0}; i < constants::board64.size(); ++m_fenIndex) {
     char c{m_fenStr[m_fenIndex]};
     if (c == '/')
@@ -35,15 +36,16 @@ void FenParser::populateBoard(Game& game) {
     // The board is stored as little endian ranks and files.                 - Ex:  a1 b1 c1 ... a2 b2 ... g8 h8
     // https://www.chessprogramming.org/Square_Mapping_Considerations#Endianness
     // squareIndexLittleEndianRank = squareIndexBigEndianRank    ^ 56;
-    boardIndex = i ^ 56;
+    board64Index = i ^ 56;
+    boardIndex = constants::board64[board64Index];
 
-    std::byte& square{game.m_board[constants::board64[boardIndex]]};
+    std::byte& square{game.m_board[boardIndex]};
     square = pieces::charToPiece(c);
     if (islower(c)) {
       square |= pieces::BLACK;
-      game.m_blackList.append(square, boardIndex);
+      game.m_blackList.append(boardIndex);
     } else {
-      game.m_whiteList.append(square, boardIndex);
+      game.m_whiteList.append(boardIndex);
     }
     ++i;
   }
