@@ -22,7 +22,7 @@ bool Board::isPieceOfColorAtIndex(std::byte color, uint8_t index) const {
 }
 
 bool Board::isAtPawnHomeRankOfColor(std::byte color, uint8_t index) const {
-  if (color == constants::WHITE)
+  if (color == pieces::WHITE)
     return (constants::board64[H1] < index) && (index < constants::board64[A3]);
   else
     return (constants::board64[H6] < index) && (index < constants::board64[A8]);
@@ -40,24 +40,6 @@ void Board::debugPrint() const {
   for (int i{0}; i < m_board.size(); ++i) {
     if ((i % 10) == 0)
       std::cout << '\n';
-    switch (m_board[i]) {
-    case constants::SENTINAL: std::cout << "FF "; break;
-    case constants::EMPTY_SQUARE: std::cout << "XX "; break;
-    // White pieces
-    case constants::WHITE | constants::PAWN: std::cout << "WP "; break;
-    case constants::WHITE | constants::ROOK: std::cout << "WR "; break;
-    case constants::WHITE | constants::KNIGHT: std::cout << "WN "; break;
-    case constants::WHITE | constants::BISHOP: std::cout << "WB "; break;
-    case constants::WHITE | constants::QUEEN: std::cout << "WQ "; break;
-    case constants::WHITE | constants::KING: std::cout << "WK "; break;
-    // Black pieces
-    case constants::BLACK | constants::PAWN: std::cout << "BP "; break;
-    case constants::BLACK | constants::ROOK: std::cout << "BR "; break;
-    case constants::BLACK | constants::KNIGHT: std::cout << "BN "; break;
-    case constants::BLACK | constants::BISHOP: std::cout << "BB "; break;
-    case constants::BLACK | constants::QUEEN: std::cout << "BQ "; break;
-    case constants::BLACK | constants::KING: std::cout << "BK "; break;
-    default: std::cout << "?? "; break;
-    }
+    pieces::print(m_board[i]);
   }
 }

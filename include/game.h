@@ -25,12 +25,14 @@ private:
   PieceList m_whiteList{};
   PieceList m_blackList{};
 
-  void appendMoveHelper(MoveList&, uint8_t, int8_t, uint8_t = 0b0000) const;
+  void appendMoveHelper(MoveList&, uint8_t, int8_t,
+                        uint8_t = 0b0000) const;         // Ts all needs to be in a move generator class.
   void appendCaptureHelper(MoveList&, uint8_t, int8_t, uint8_t = 0b0100) const;
   void appendPawnPromotion(MoveList&, uint8_t, int8_t) const;
   void appendPawnPromotionCapture(MoveList&, uint8_t, int8_t) const;
   void generatePseudoLegalPawnMoves(MoveList&, std::byte, std::byte, uint8_t) const;
   void handleCastleGeneration(MoveList&, uint8_t, uint8_t) const;
+
   MoveList generatePseudoLegal() const;
 
   void makeMove(Move);

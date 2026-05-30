@@ -54,7 +54,7 @@ void Game::generatePseudoLegalPawnMoves(MoveList& moves, std::byte color, std::b
   int frontOffset{10};
   int captureLeftOffset{11};
   int captureRightOffset{9};
-  if (color != constants::WHITE) {
+  if (color == pieces::BLACK) {
     frontOffset *= -1;
     captureLeftOffset *= -1;
     captureRightOffset *= -1;
@@ -78,11 +78,11 @@ void Game::generatePseudoLegalPawnMoves(MoveList& moves, std::byte color, std::b
 
   if (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, initialSquare + frontOffset)) {
 
-    moves.appendMove(constants::PAWN, initialSquare, frontOffset);
+    moves.appendMove(pieces::PAWN, initialSquare, frontOffset);
 
     if ((m_board.isAtPawnHomeRankOfColor(color, initialSquare)) &&
         (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, initialSquare + (frontOffset * 2)))) {
-      moves.appendMove(constants::PAWN, initialSquare, frontOffset * 2, 0b0001);
+      moves.appendMove(pieces::PAWN, initialSquare, frontOffset * 2, 0b0001);
     }
   }
 
@@ -99,27 +99,27 @@ void Game::generatePseudoLegalPawnMoves(MoveList& moves, std::byte color, std::b
   }
 
   if (constants::board64[m_enPassant] == (initialSquare + captureRightOffset)) {
-    moves.appendCapture(constants::PAWN, constants::PAWN, initialSquare, captureRightOffset, 0b0101);
+    moves.appendCapture(pieces::PAWN, pieces::PAWN, initialSquare, captureRightOffset, 0b0101);
     return;
   }
 
   if (constants::board64[m_enPassant] == (initialSquare + captureLeftOffset)) {
-    moves.appendCapture(constants::PAWN, constants::PAWN, initialSquare, captureLeftOffset, 0b0101);
+    moves.appendCapture(pieces::PAWN, pieces::PAWN, initialSquare, captureLeftOffset, 0b0101);
   }
 }
 
 void Game::handleCastleGeneration(MoveList& moves, uint8_t rookPosition, uint8_t kingPosition) const {
   if (kingPosition == E1) {
     if (rookPosition == H1 && m_canCastleKQkq[0]) {
-      moves.appendMove(constants::KING, 2, 0b0010);
+      moves.appendMove(pieces::KING, 2, 0b0010);
     } else if (rookPosition == A1 && m_canCastleKQkq[1]) {
-      moves.appendMove(constants::KING, -2, 0b0011);
+      moves.appendMove(pieces::KING, -2, 0b0011);
     }
   } else if (kingPosition == E8) {
     if (rookPosition == H8 && m_canCastleKQkq[2]) {
-      moves.appendMove(constants::KING, 2, 0b0010);
+      moves.appendMove(pieces::KING, 2, 0b0010);
     } else if (rookPosition == A8 && m_canCastleKQkq[3]) {
-      moves.appendMove(constants::KING, -2, 0b0011);
+      moves.appendMove(pieces::KING, -2, 0b0011);
     }
   }
 }
@@ -127,20 +127,20 @@ void Game::handleCastleGeneration(MoveList& moves, uint8_t rookPosition, uint8_t
 MoveList Game::generatePseudoLegal() const {
   MoveList moves{};
   const PieceList& list{m_whiteTurn ? m_whiteList : m_blackList};
-  std::byte color{m_whiteTurn ? constants::WHITE : constants::BLACK};
+  std::byte color{m_whiteTurn ? pieces::WHITE : pieces::BLACK};
   std::byte enemy{color ^ std::byte{0x80}};
 
   for (int i{0}; i < list.size(); ++i) {
     uint8_t initialSquare{constants::board64[list[i]]};
     uint8_t pieceInt{static_cast<uint8_t>(m_board.at(initialSquare) & std::byte{0x07})};
 
-    if (m_board.isPieceAtIndex(constants::PAWN, initialSquare)) {
+    if (m_board.isPieceAtIndex(pieces::PAWN, initialSquare)) {
       generatePseudoLegalPawnMoves(moves, color, enemy, initialSquare);
       continue;
     }
 
-    for (int j{0}; j < constants::offset_count[pieceInt]; ++j) {
-      for (int moveOffset{constants::offsets[pieceInt][j]}, move{initialSquare};;) {
+    for (int j{0}; j < pieces::offset_count[pieceInt]; ++j) {
+      for (int moveOffset{pieces::offsets[pieceInt][j]}, move{initialSquare};;) {
         move += moveOffset;
         if (m_board.isPieceAtIndex(constants::SENTINAL, move)) {
           break;
@@ -149,17 +149,15 @@ MoveList Game::generatePseudoLegal() const {
           appendMoveHelper(moves, initialSquare, moveOffset);
         } else {
           if (m_board.isColorAtIndex(color, move)) {
-            if (m_board.isPieceAtIndex(constants::KING, move)) {
-              if (m_board.isPieceAtIndex(constants::ROOK, initialSquare)) {
-                handleCastleGeneration(moves, initialSquare, move);
-              }
+            if (m_board.isPieceAtIndex(pieces::ROOK, initialSquare) && m_board.isPieceAtIndex(pieces::KING, move)) {
+              handleCastleGeneration(moves, initialSquare, move);
             }
             break;
           }
           appendCaptureHelper(moves, initialSquare, moveOffset);
           break;
         }
-        if (!constants::slide[pieceInt])
+        if (!pieces::slide[pieceInt])
           break;
       }
     }

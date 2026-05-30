@@ -1,8 +1,17 @@
 #pragma once
 
+#include <cstddef>
+#include <cstdint>
+
 class Move {
 public:
-  Move(unsigned int from, unsigned int to, unsigned int flags, unsigned int fromPiece, unsigned int toPiece);
+  Move(uint8_t from, uint8_t to, uint8_t flags, uint8_t fromPiece, uint8_t toPiece);
+
+  uint8_t getFrom() const;
+  uint8_t getTo() const;
+  uint8_t getFlags() const;
+  std::byte getFromPiece() const;
+  std::byte getToPiece() const;
 
 private:
                           //                   FROM

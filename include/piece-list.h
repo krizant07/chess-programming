@@ -1,12 +1,11 @@
 #pragma once
 
-#include <array>
-#include <cstdint>
+#include "constants.h"
 
 class PieceList {
 public:
   PieceList();
-  void append(std::byte, uint8_t);
+  void append(pieces::Piece, uint8_t);
   uint8_t size() const;
   uint8_t capacity() const;
 

@@ -12,17 +12,6 @@ public:
 
 private:
   int extractInt();
-  static std::byte charToPiece(char c) {
-    switch (tolower(c)) {
-    case 'p': return constants::PAWN;
-    case 'r': return constants::ROOK;
-    case 'n': return constants::KNIGHT;
-    case 'b': return constants::BISHOP;
-    case 'q': return constants::QUEEN;
-    case 'k': return constants::KING;
-    default: return constants::EMPTY_SQUARE;
-    }
-  }
 
   void populateBoard(Game&);
   void setWhiteTurn(Game&);

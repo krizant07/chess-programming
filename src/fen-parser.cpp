@@ -38,9 +38,9 @@ void FenParser::populateBoard(Game& game) {
     boardIndex = i ^ 56;
 
     std::byte& square{game.m_board[constants::board64[boardIndex]]};
-    square = charToPiece(c);
+    square = pieces::charToPiece(c);
     if (islower(c)) {
-      square |= constants::BLACK;
+      square |= pieces::BLACK;
       game.m_blackList.append(square, boardIndex);
     } else {
       game.m_whiteList.append(square, boardIndex);
