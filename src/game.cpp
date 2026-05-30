@@ -7,7 +7,8 @@
 
 Game::Game() {}
 
-void Game::debugPrint() const {
+MoveList Game::debugPrint() const {
+  std::byte color{m_whiteTurn ? pieces::WHITE : pieces::BLACK};
   std::cout << "Game Debug:";
 
   m_board.debugPrint();
@@ -25,6 +26,81 @@ void Game::debugPrint() const {
 
   MoveList list = generatePseudoLegal();
   std::cout << "MOVE LIST SIZE: " << list.size() << '\n';
+
+  for (int i{0}; i < list.size(); ++i) {
+    std::cout << "Move #" << i << ":\n";
+    std::cout << "From Piece: ";
+    pieces::print(list[i].fromPiece() | color);
+    std::cout << '\n';
+    std::cout << "To Square:  " << int(list[i].to()) << '\n';
+  }
+
+  return list;
+}
+
+void Game::makeMove(Move move) {
+  std::byte color{m_whiteTurn ? pieces::WHITE : pieces::BLACK};
+  std::byte enemy{m_whiteTurn ? pieces::BLACK : pieces::WHITE};
+  Square kingside{m_whiteTurn ? H1 : H8};
+  Square queenside{m_whiteTurn ? A1 : A8};
+  PieceList& list = m_whiteTurn ? m_whiteList : m_blackList;
+  PieceList& enemyList = m_whiteTurn ? m_blackList : m_whiteList;
+
+  uint8_t from{move.from()};
+  uint8_t to{move.to()};
+  uint8_t flags{move.flags()};
+  std::byte fromPiece{move.fromPiece()};
+
+  m_board[from] = constants::EMPTY_SQUARE;
+  list.move(from, to);
+
+  m_board[to] = fromPiece;
+  enemyList.remove(to);
+
+  m_whiteTurn = !m_whiteTurn;
+
+  if (m_whiteTurn) { // Increment when it becomes whites turn
+    ++m_fullMoveCount;
+  }
+
+  if (flags == 1) { // double pawn push
+    if (color == pieces::WHITE) {
+      m_enPassant = from - 10;
+    } else {
+      m_enPassant = from + 10;
+    }
+    return;
+  } else {
+    m_enPassant = -1;
+  }
+
+  if (flags & (1 << 1)) { // Castling
+    if (flags & 1) { // Queenside
+      m_board[to + 1] = pieces::ROOK;
+      m_board[constants::board64[queenside]] = constants::EMPTY_SQUARE;
+      list.move(constants::board64[queenside], to + 1);
+    } else { // Kingside
+      m_board[to - 1] = pieces::ROOK;
+      m_board[constants::board64[kingside]] = constants::EMPTY_SQUARE;
+      list.move(constants::board64[kingside], to - 1);
+    }
+    return;
+  }
+
+  if (flags & (1 << 3)) { // pawn promotion shite
+    m_board[to] = pieces::codeToPiece(flags & ((1 << 2) - 1));
+    return;
+  }
+
+  if ((flags & (1 << 2)) && (flags & 1)) { // En passant capture
+    if (color == pieces::WHITE) {
+      m_board[to - 10] = constants::EMPTY_SQUARE;
+      enemyList.remove(to - 10);
+    } else {
+      m_board[to + 10] = constants::EMPTY_SQUARE;
+      enemyList.remove(to + 10);
+    }
+  }
 }
 
 void Game::appendMoveHelper(MoveList& moves, uint8_t initialSquare, int8_t offset, uint8_t flags) const {
@@ -166,62 +242,4 @@ MoveList Game::generatePseudoLegal() const {
     }
   }
   return moves;
-}
-
-void Game::makeMove(Move move) {
-  std::byte color{pieces::WHITE};
-  std::byte enemy{pieces::BLACK};
-  PieceList& list{m_whiteList};
-  PieceList& enemyList{m_blackList};
-  if (!m_whiteTurn) {
-    color = pieces::BLACK;
-    enemy = pieces::WHITE;
-    list = m_blackList;
-    enemyList = m_whiteList;
-  }
-
-  uint8_t from{move.from()};
-  uint8_t to{move.to()};
-  uint8_t flags{move.flags()};
-  std::byte fromPiece{move.fromPiece()};
-
-  m_board[from] = constants::EMPTY_SQUARE;
-  enemyList.remove(from);
-
-  if (flags & (1 << 3)) { // pawn promotion shite
-    m_board[to] = pieces::codeToPiece(flags & ((1 << 2) - 1));
-    list[from];
-    std::cout << "Oi cunt you didnt implement promotions.\n";
-    return;
-  }
-
-  if (flags & (1 << 1)) { // Castling
-    if (flags & 1) { // Queenside
-
-    } else { // Kingside
-    }
-  }
-
-  m_board[to] = fromPiece;
-
-  if ((flags & (1 << 2)) && (flags & 1)) { // En passant capture
-    std::cout << "Oi cunt you didnt implement En passant captures.\n";
-  }
-
-  m_whiteTurn = !m_whiteTurn;
-
-  if (m_whiteTurn) { // Increment when it becomes whites turn
-    ++m_fullMoveCount;
-  }
-
-  if (flags == 1) { // double pawn push
-    if (color == pieces::WHITE) {
-      m_enPassant = from - 10;
-    } else {
-      m_enPassant = from + 10;
-    }
-    return;
-  } else {
-    m_enPassant = -1;
-  }
 }

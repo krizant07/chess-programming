@@ -8,9 +8,9 @@ public:
   PieceList();
   void append(uint8_t);
   void remove(uint8_t);
+  void move(uint8_t, uint8_t);
   uint8_t size() const;
 
-  int8_t at(uint8_t) const;
   int8_t operator[](uint8_t) const;
 
 private:

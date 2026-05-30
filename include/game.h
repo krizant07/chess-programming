@@ -10,7 +10,9 @@ class Game {
 public:
   Game();
 
-  void debugPrint() const;
+  MoveList debugPrint() const;
+
+  void makeMove(Move);
 
   friend class FenParser;
 
@@ -34,6 +36,4 @@ private:
   void handleCastleGeneration(MoveList&, uint8_t, uint8_t) const;
 
   MoveList generatePseudoLegal() const;
-
-  void makeMove(Move);
 };

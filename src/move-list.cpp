@@ -18,3 +18,7 @@ void MoveList::appendCapture(std::byte piece, std::byte captured, uint8_t initia
                       static_cast<unsigned int>(flags), static_cast<unsigned int>(piece),
                       static_cast<unsigned int>(captured));
 }
+
+Move MoveList::operator[](uint8_t i) const {
+  return m_list[i];
+}
