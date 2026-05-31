@@ -7,7 +7,7 @@
 
 Game::Game() {}
 
-MoveList Game::debugPrint() const {
+MoveList Game::debugPrint() {
   std::byte color{m_whiteTurn ? pieces::WHITE : pieces::BLACK};
   std::cout << "Game Debug:";
 
@@ -24,18 +24,17 @@ MoveList Game::debugPrint() const {
   std::cout << "HALF MOVE CLOCK: " << m_halfMoveClock << '\n';
   std::cout << "FULL MOVE COUNT: " << m_fullMoveCount << '\n';
 
-  MoveList list = generatePseudoLegal();
-  std::cout << "MOVE LIST SIZE: " << list.size() << '\n';
+  MoveList moveList = generatePseudoLegal();
+  PieceList& pieceList{m_whiteTurn ? m_whiteList : m_blackList};
+  std::cout << "MOVE LIST SIZE: " << moveList.size() << '\n';
 
-  for (int i{0}; i < list.size(); ++i) {
-    std::cout << "Move #" << i << ":\n";
-    std::cout << "From Piece: ";
-    pieces::print(list[i].fromPiece() | color);
-    std::cout << '\n';
-    std::cout << "To Square:  " << int(list[i].to()) << '\n';
+  for (int i{0}; i < pieceList.size(); ++i) {
+    std::cout << "Piece #" << i << ":\n";
+    std::cout << "Move count: " << int(pieceList.moveCount(i));
+    std::cout << "\n\n";
   }
 
-  return list;
+  return moveList;
 }
 
 void Game::printList(std::byte color) const {
@@ -145,8 +144,9 @@ void Game::appendPawnPromotionCapture(MoveList& moves, uint8_t from, int8_t offs
   appendCaptureHelper(moves, from, offset, 0b1111);
 }
 
-void Game::generatePseudoLegalPawnMoves(MoveList& moves, std::byte color, std::byte enemy,
-                                        uint8_t initialSquare) const {
+uint8_t Game::generatePseudoLegalPawnMoves(MoveList& moves, std::byte color, std::byte enemy,
+                                           uint8_t initialSquare) const {
+  uint8_t count{};
   int frontOffset{color == pieces::WHITE ? 10 : -10};
   int captureLeftOffset{color == pieces::WHITE ? 11 : -11};
   int captureRightOffset{color == pieces::WHITE ? 9 : -9};
@@ -154,74 +154,92 @@ void Game::generatePseudoLegalPawnMoves(MoveList& moves, std::byte color, std::b
 
     if (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, initialSquare + frontOffset)) {
       appendPawnPromotion(moves, initialSquare, frontOffset);
+      count += 4;
     }
 
     if (m_board.isPieceOfColorAtIndex(enemy, initialSquare + captureRightOffset)) {
       appendPawnPromotionCapture(moves, initialSquare, captureRightOffset);
+      count += 4;
     }
 
     if (m_board.isPieceOfColorAtIndex(enemy, initialSquare + captureLeftOffset)) {
       appendPawnPromotionCapture(moves, initialSquare, captureLeftOffset);
+      count += 4;
     }
 
-    return; // There should be no more legal moves for a pawn if its promotable
+    return count; // There should be no more legal moves for a pawn if its promotable
   }
 
   if (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, initialSquare + frontOffset)) {
 
     moves.appendMove(pieces::PAWN, initialSquare, frontOffset);
+    ++count;
 
     if ((m_board.isAtPawnHomeRankOfColor(color, initialSquare)) &&
         (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, initialSquare + (frontOffset * 2)))) {
       moves.appendMove(pieces::PAWN, initialSquare, frontOffset * 2, 0b0001);
+      ++count;
     }
   }
 
   if (m_board.isPieceOfColorAtIndex(enemy, initialSquare + captureRightOffset)) {
     appendCaptureHelper(moves, initialSquare, captureRightOffset);
+    ++count;
   }
 
   if (m_board.isPieceOfColorAtIndex(enemy, initialSquare + captureLeftOffset)) {
     appendCaptureHelper(moves, initialSquare, captureLeftOffset);
+    ++count;
   }
 
   if (m_enPassant == -1) {
-    return;
+    return count;
   }
 
   if (m_enPassant == (initialSquare + captureRightOffset)) {
     moves.appendCapture(pieces::PAWN, pieces::PAWN, initialSquare, captureRightOffset, 0b0101);
-    return;
+    ++count;
+    return count;
   }
 
   if (m_enPassant == (initialSquare + captureLeftOffset)) {
     moves.appendCapture(pieces::PAWN, pieces::PAWN, initialSquare, captureLeftOffset, 0b0101);
+    ++count;
   }
+
+  return count;
 }
 
-void Game::handleCastleGeneration(MoveList& moves, uint8_t rookPosition, uint8_t kingPosition) const {
+uint8_t Game::handleCastleGeneration(MoveList& moves, uint8_t rookPosition, uint8_t kingPosition) const {
   if (kingPosition == E1) {
     if (rookPosition == H1 && m_canCastleKQkq[0]) {
       moves.appendMove(pieces::KING, 2, 0b0010);
+      return 1;
     } else if (rookPosition == A1 && m_canCastleKQkq[1]) {
       moves.appendMove(pieces::KING, -2, 0b0011);
+      return 1;
     }
   } else if (kingPosition == E8) {
     if (rookPosition == H8 && m_canCastleKQkq[2]) {
       moves.appendMove(pieces::KING, 2, 0b0010);
+      return 1;
     } else if (rookPosition == A8 && m_canCastleKQkq[3]) {
       moves.appendMove(pieces::KING, -2, 0b0011);
+      return 1;
     }
   }
+  return 0;
 }
 
-MoveList Game::generatePseudoLegal() const {
+MoveList Game::generatePseudoLegal() {
   MoveList moves{};
-  const PieceList& list{m_whiteTurn ? m_whiteList : m_blackList};
+  PieceList& list{m_whiteTurn ? m_whiteList : m_blackList};
   std::byte color{m_whiteTurn ? pieces::WHITE : pieces::BLACK};
   std::byte enemy{color ^ std::byte{(1 << 7)}};
+  uint8_t count{};
 
   for (int i{0}; i < list.size(); ++i) {
+    count = 0;
     if (list[i] == -1) {
       assert(false && "Yo this should never happen yo");
     }
@@ -229,7 +247,8 @@ MoveList Game::generatePseudoLegal() const {
     uint8_t pieceInt{static_cast<uint8_t>(m_board.at(initialSquare) & std::byte{0x07})};
 
     if (m_board.isPieceAtIndex(pieces::PAWN, initialSquare)) {
-      generatePseudoLegalPawnMoves(moves, color, enemy, initialSquare);
+      count = generatePseudoLegalPawnMoves(moves, color, enemy, initialSquare);
+      list.setMoveCount(i, count);
       continue;
     }
 
@@ -241,20 +260,23 @@ MoveList Game::generatePseudoLegal() const {
         }
         if (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, move)) {
           appendMoveHelper(moves, initialSquare, moveOffset);
+          ++count;
         } else {
           if (m_board.isColorAtIndex(color, move)) {
             if (m_board.isPieceAtIndex(pieces::ROOK, initialSquare) && m_board.isPieceAtIndex(pieces::KING, move)) {
-              handleCastleGeneration(moves, initialSquare, move);
+              count += handleCastleGeneration(moves, initialSquare, move);
             }
             break;
           }
           appendCaptureHelper(moves, initialSquare, moveOffset);
+          ++count;
           break;
         }
         if (!pieces::slide[pieceInt])
           break;
       }
     }
+    list.setMoveCount(i, count);
   }
   return moves;
 }

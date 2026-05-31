@@ -10,7 +10,7 @@ class Game {
 public:
   Game();
 
-  MoveList debugPrint() const;
+  MoveList debugPrint();
 
   void makeMove(Move);
 
@@ -34,8 +34,8 @@ private:
   void appendCaptureHelper(MoveList&, uint8_t, int8_t, uint8_t = 0b0100) const;
   void appendPawnPromotion(MoveList&, uint8_t, int8_t) const;
   void appendPawnPromotionCapture(MoveList&, uint8_t, int8_t) const;
-  void generatePseudoLegalPawnMoves(MoveList&, std::byte, std::byte, uint8_t) const;
-  void handleCastleGeneration(MoveList&, uint8_t, uint8_t) const;
+  uint8_t generatePseudoLegalPawnMoves(MoveList&, std::byte, std::byte, uint8_t) const;
+  uint8_t handleCastleGeneration(MoveList&, uint8_t, uint8_t) const;
 
-  MoveList generatePseudoLegal() const;
+  MoveList generatePseudoLegal();
 };
