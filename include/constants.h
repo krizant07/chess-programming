@@ -2,7 +2,6 @@
 
 #include <bitset>
 #include <cstdint>
-#include <iostream>
 #include <string_view>
 
 #include "types.h"
@@ -80,38 +79,4 @@ inline constexpr std::array<std::array<int8_t, 8>, 5> offsets = {{
     { -11, -10, -9, -1, 1,  9, 10, 11 }  /* KING */
 }};
 // clang-format on
-
-inline void print(std::byte piece) {
-  switch (piece) {
-  case SENTINAL: std::cout << "FF "; break;
-  case EMPTY: std::cout << "XX "; break;
-  // White Pieces
-  case WHITE | PAWN: std::cout << "WP "; break;
-  case WHITE | ROOK: std::cout << "WR "; break;
-  case WHITE | KNIGHT: std::cout << "WN "; break;
-  case WHITE | BISHOP: std::cout << "WB "; break;
-  case WHITE | QUEEN: std::cout << "WQ "; break;
-  case WHITE | KING: std::cout << "WK "; break;
-  // Black Pieces
-  case BLACK | PAWN: std::cout << "BP "; break;
-  case BLACK | ROOK: std::cout << "BR "; break;
-  case BLACK | KNIGHT: std::cout << "BN "; break;
-  case BLACK | BISHOP: std::cout << "BB "; break;
-  case BLACK | QUEEN: std::cout << "BQ "; break;
-  case BLACK | KING: std::cout << "BK "; break;
-  default: std::cout << "?? "; break;
-  }
-}
-
-inline constexpr std::byte charToPiece(char c) {
-  switch (tolower(c)) {
-  case 'p': return PAWN;
-  case 'r': return ROOK;
-  case 'n': return KNIGHT;
-  case 'b': return BISHOP;
-  case 'q': return QUEEN;
-  case 'k': return KING;
-  default: return EMPTY;
-  }
-}
 }; // namespace pieces

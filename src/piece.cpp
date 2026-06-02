@@ -1,7 +1,9 @@
 #include "piece.h"
 
 #include "constants.h"
+
 #include <cstddef>
+#include <iostream>
 
 Piece::Piece() {};
 

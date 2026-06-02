@@ -39,7 +39,7 @@ std::byte Board::at(uint8_t i) const {
 }
 
 void Board::debugPrint() const {
-  for (int i{0}; i < m_board.size(); ++i) {
+  for (std::size_t i{0}; i < m_board.size(); ++i) {
     if ((i % 10) == 0)
       std::cout << '\n';
     m_board[i].print();

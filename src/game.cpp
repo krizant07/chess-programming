@@ -8,7 +8,6 @@
 Game::Game() {}
 
 MoveList Game::debugPrint() {
-  std::byte color{m_whiteTurn ? pieces::WHITE : pieces::BLACK};
   std::cout << "Game Debug:";
 
   m_board.debugPrint();
@@ -37,23 +36,8 @@ MoveList Game::debugPrint() {
   return moveList;
 }
 
-void Game::printList(std::byte color) const {
-  std::cout << ((color == pieces::WHITE) ? "White" : "Black") << " List:\n";
-  std::cout << "Black List:\n";
-  const PieceList& list{color == pieces::WHITE ? m_whiteList : m_blackList};
-  for (int i{0}; i < list.size(); ++i) {
-    int8_t index{list[i]};
-    if (index == -1)
-      break;
-
-    pieces::print(m_board.at(index) | pieces::BLACK);
-    std::cout << "at " << int(index) << '\n';
-  }
-}
-
 void Game::makeMove(Move move) {
   std::byte color{m_whiteTurn ? pieces::WHITE : pieces::BLACK};
-  std::byte enemy{m_whiteTurn ? pieces::BLACK : pieces::WHITE};
   Square kingside{m_whiteTurn ? H1 : H8};
   Square queenside{m_whiteTurn ? A1 : A8};
   PieceList& list = m_whiteTurn ? m_whiteList : m_blackList;
@@ -101,12 +85,12 @@ void Game::makeMove(Move move) {
       m_board[to + 1].setCode(pieces::ROOK);
       m_board[to + 1].setColor(color);
       m_board[constants::board64[queenside]].setCode(pieces::EMPTY);
-      list.move(constants::board64[queenside], to + 1);
+      list.move(m_board[constants::board64[queenside]].pieceListIndex(), to + 1);
     } else { // Kingside
       m_board[to - 1].setCode(pieces::ROOK);
       m_board[to - 1].setColor(color);
       m_board[constants::board64[kingside]].setCode(pieces::EMPTY);
-      list.move(constants::board64[kingside], to - 1);
+      list.move(m_board[constants::board64[kingside]].pieceListIndex(), to - 1);
     }
     return;
   }
@@ -117,13 +101,16 @@ void Game::makeMove(Move move) {
     return;
   }
 
-  if ((flags & (1 << 2)) && (flags & 1)) { // En passant capture
-    if (color == pieces::WHITE) {
-      m_board[to - 10].setCode(pieces::EMPTY);
-      listRemoveHelper(enemyList, to - 10);
-    } else {
-      m_board[to + 10].setCode(pieces::EMPTY);
-      listRemoveHelper(enemyList, to + 10);
+  if (flags & (1 << 2)) { // Capture
+    m_halfMoveClock = 0;
+    if ((flags & 1)) { // En passant capture
+      if (color == pieces::WHITE) {
+        m_board[to - 10].setCode(pieces::EMPTY);
+        listRemoveHelper(enemyList, to - 10);
+      } else {
+        m_board[to + 10].setCode(pieces::EMPTY);
+        listRemoveHelper(enemyList, to + 10);
+      }
     }
   }
 }
@@ -222,20 +209,20 @@ uint8_t Game::generatePseudoLegalPawnMoves(MoveList& moves, std::byte color, std
 }
 
 uint8_t Game::handleCastleGeneration(MoveList& moves, uint8_t rookPosition, uint8_t kingPosition) const {
-  if (kingPosition == E1) {
-    if (rookPosition == H1 && m_canCastleKQkq[0]) {
-      moves.appendMove(pieces::KING, 2, 0b0010);
+  if (kingPosition == constants::board64[E1]) {
+    if (rookPosition == constants::board64[H1] && m_canCastleKQkq[0]) {
+      moves.appendMove(pieces::KING, constants::board64[kingPosition], 2, 0b0010);
       return 1;
-    } else if (rookPosition == A1 && m_canCastleKQkq[1]) {
-      moves.appendMove(pieces::KING, -2, 0b0011);
+    } else if (rookPosition == constants::board64[A1] && m_canCastleKQkq[1]) {
+      moves.appendMove(pieces::KING, constants::board64[kingPosition], -2, 0b0011);
       return 1;
     }
-  } else if (kingPosition == E8) {
-    if (rookPosition == H8 && m_canCastleKQkq[2]) {
-      moves.appendMove(pieces::KING, 2, 0b0010);
+  } else if (kingPosition == constants::board64[E8]) {
+    if (rookPosition == constants::board64[H8] && m_canCastleKQkq[2]) {
+      moves.appendMove(pieces::KING, constants::board64[kingPosition], 2, 0b0010);
       return 1;
-    } else if (rookPosition == A8 && m_canCastleKQkq[3]) {
-      moves.appendMove(pieces::KING, -2, 0b0011);
+    } else if (rookPosition == constants::board64[A8] && m_canCastleKQkq[3]) {
+      moves.appendMove(pieces::KING, constants::board64[kingPosition], -2, 0b0011);
       return 1;
     }
   }

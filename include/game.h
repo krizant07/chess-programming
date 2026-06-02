@@ -31,8 +31,8 @@ private:
 
   void listRemoveHelper(PieceList&, uint8_t);
   void appendMoveHelper(MoveList&, uint8_t, int8_t,
-                        uint8_t = 0b0000) const;         // Ts all needs to be in a move generator class.
-  void appendCaptureHelper(MoveList&, uint8_t, int8_t, uint8_t = 0b0100) const;
+                        uint8_t flags = 0b0000) const;         // Ts all needs to be in a move generator class.
+  void appendCaptureHelper(MoveList&, uint8_t, int8_t, uint8_t flags = 0b0100) const;
   void appendPawnPromotion(MoveList&, uint8_t, int8_t) const;
   void appendPawnPromotionCapture(MoveList&, uint8_t, int8_t) const;
   uint8_t generatePseudoLegalPawnMoves(MoveList&, std::byte, std::byte, uint8_t) const;

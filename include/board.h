@@ -6,8 +6,6 @@ class Board {
 public:
   Board();
 
-  int populate(std::string_view);
-
   bool isPieceAtIndex(std::byte, uint8_t) const;
   bool isColorAtIndex(std::byte, uint8_t) const;
   bool isPieceOfColorAtIndex(std::byte, uint8_t) const;

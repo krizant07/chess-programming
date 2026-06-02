@@ -21,5 +21,5 @@ private:
   void setFullMove(Game&);
 
   std::string_view m_fenStr{};
-  int m_fenIndex{};
+  std::size_t m_fenIndex{};
 };

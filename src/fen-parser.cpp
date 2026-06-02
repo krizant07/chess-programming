@@ -23,7 +23,7 @@ FenParser::FenParser() {};
 void FenParser::populateBoard(Game& game) {
   int8_t board64Index{};
   int8_t boardIndex{};
-  for (int i{0}; i < constants::board64.size(); ++m_fenIndex) {
+  for (std::size_t i{0}; i < constants::board64.size(); ++m_fenIndex) {
     char c{m_fenStr[m_fenIndex]};
     if (c == '/')
       continue;
@@ -102,7 +102,7 @@ void FenParser::setEnPassant(Game& game) {
     return;
   }
   val += (c - '1');
-  game.m_enPassant = val;
+  game.m_enPassant = constants::board64[val];
   m_fenIndex += 2;
 }
 

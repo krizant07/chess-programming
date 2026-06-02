@@ -2,6 +2,8 @@
 #include "fen-parser.h"
 #include "game.h"
 
+#include <iostream>
+
 Game buildGame(std::string_view fenStr) {
   FenParser parser{};
   Game game{};
