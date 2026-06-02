@@ -17,15 +17,10 @@ int main() {
 
   MoveList moves{game.debugPrint()};
 
-  std::size_t n{};
-  std::cout << "Hey chud pick a move number (there is NO validation, please be nice): ";
+  int n{};
+  std::cout << "Please pick a square number ( 0 - 63 ):";
   std::cin >> n;
-
-  std::cout << "Size: " << moves.size() << '\n';
-
-  game.makeMove(moves[n]);
-
-  game.debugPrint();
+  game.printMovesOfSquare(moves, static_cast<Square>(n));
 
   return 0;
 }

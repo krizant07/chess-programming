@@ -23,12 +23,20 @@ uint8_t PieceList::size() const {
   return m_size;
 }
 
-void PieceList::setMoveCount(uint8_t i, int8_t count) {
+void PieceList::setMoveCount(uint8_t i, uint8_t count) {
   m_moveCount[i] = count;
 }
 
-int8_t PieceList::moveCount(uint8_t i) const {
+void PieceList::setMoveIndex(uint8_t i, uint8_t moveIndex) {
+  m_moveListIndex[i] = moveIndex;
+}
+
+uint8_t PieceList::moveCount(uint8_t i) const {
   return m_moveCount[i];
+}
+
+uint8_t PieceList::moveIndex(uint8_t i) const {
+  return m_moveListIndex[i];
 }
 
 int8_t PieceList::operator[](uint8_t i) const {

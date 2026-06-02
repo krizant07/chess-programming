@@ -2,9 +2,11 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 
 class Move {
 public:
+  Move();
   Move(uint8_t from, uint8_t to, uint8_t flags, uint8_t fromPiece, uint8_t toPiece);
 
   uint8_t from() const;
@@ -23,3 +25,5 @@ private:
                           //               PIECE
                           //               CODE
 };
+
+std::ostream& operator<<(std::ostream&, const Move&);

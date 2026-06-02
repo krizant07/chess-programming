@@ -24,16 +24,25 @@ MoveList Game::debugPrint() {
   std::cout << "FULL MOVE COUNT: " << m_fullMoveCount << '\n';
 
   MoveList moveList = generatePseudoLegal();
-  PieceList& pieceList{m_whiteTurn ? m_whiteList : m_blackList};
   std::cout << "MOVE LIST SIZE: " << moveList.size() << '\n';
 
-  for (int i{0}; i < pieceList.size(); ++i) {
-    std::cout << "Piece #" << i << ":\n";
-    std::cout << "Move count: " << int(pieceList.moveCount(i));
-    std::cout << "\n\n";
-  }
-
   return moveList;
+}
+
+void Game::printMovesOfSquare(MoveList& moveList, enum Square sq) {
+  Piece& piece{m_board[constants::board64[sq]]};
+  PieceList& pieceList{piece.color() == pieces::WHITE ? m_whiteList : m_blackList};
+  uint8_t pieceListIndex{piece.pieceListIndex()};
+  uint8_t moveListIndex{pieceList.moveIndex(pieceListIndex)};
+  Move move{};
+
+  piece.print();
+  std::cout << " has the moves:\n";
+
+  for (int i{0}; i < pieceList.moveCount(pieceListIndex); ++i) {
+    move = moveList[moveListIndex + i];
+    std::cout << move;
+  }
 }
 
 void Game::makeMove(Move move) {
@@ -235,6 +244,7 @@ MoveList Game::generatePseudoLegal() {
   std::byte color{m_whiteTurn ? pieces::WHITE : pieces::BLACK};
   std::byte enemy{m_whiteTurn ? pieces::BLACK : pieces::WHITE};
   uint8_t count{};
+  uint8_t moveListIndex{};
 
   for (int i{0}; i < list.size(); ++i) {
     count = 0;
@@ -247,6 +257,8 @@ MoveList Game::generatePseudoLegal() {
     if (m_board.isPieceAtIndex(pieces::PAWN, initialSquare)) {
       count = generatePseudoLegalPawnMoves(moves, color, enemy, initialSquare);
       list.setMoveCount(i, count);
+      list.setMoveIndex(i, moveListIndex);
+      moveListIndex += count;
       continue;
     }
 
@@ -275,6 +287,9 @@ MoveList Game::generatePseudoLegal() {
       }
     }
     list.setMoveCount(i, count);
+    list.setMoveIndex(i, moveListIndex);
+
+    moveListIndex += count;
   }
   return moves;
 }

@@ -12,8 +12,10 @@ public:
   uint8_t remove(uint8_t);
   void move(uint8_t, uint8_t);
 
-  void setMoveCount(uint8_t, int8_t);
-  int8_t moveCount(uint8_t) const;
+  void setMoveCount(uint8_t, uint8_t);
+  void setMoveIndex(uint8_t, uint8_t);
+  uint8_t moveIndex(uint8_t) const;
+  uint8_t moveCount(uint8_t) const;
 
   int8_t operator[](uint8_t) const;
 

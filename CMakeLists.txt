@@ -19,6 +19,6 @@ set(SOURCES
 
 add_executable(board ${SOURCES})
 
-target_include_directories(board PRIVATE include)
+target_compile_options(board PRIVATE -Wall -Werror -pedantic-errors)
 
-target_compile_options(board PRIVATE -Wall -Werror)
+target_include_directories(board PRIVATE include)

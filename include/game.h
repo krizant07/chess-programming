@@ -13,6 +13,7 @@ public:
   MoveList debugPrint();
 
   void makeMove(Move);
+  void printMovesOfSquare(MoveList&, enum Square);
 
   friend class FenParser;
 

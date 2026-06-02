@@ -7,6 +7,8 @@
 
 Piece::Piece() {};
 
+Piece::Piece(std::byte data) : m_piece{data} {};
+
 std::byte Piece::code() const {
   return m_piece & (std::byte{0b0111});
 }
