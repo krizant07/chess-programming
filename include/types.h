@@ -1,6 +1,8 @@
 #include <array>
 
-using BoardArray = std::array<std::byte, 120>;
+#include "piece.h"
+
+using BoardArray = std::array<Piece, 120>;
 
 // clang-format off
 enum Square {

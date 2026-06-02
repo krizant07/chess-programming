@@ -19,6 +19,8 @@ int main() {
   std::cout << "Hey chud pick a move number (there is NO validation, please be nice): ";
   std::cin >> n;
 
+  std::cout << "Size: " << moves.size() << '\n';
+
   game.makeMove(moves[n]);
 
   game.debugPrint();

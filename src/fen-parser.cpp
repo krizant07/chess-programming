@@ -39,13 +39,18 @@ void FenParser::populateBoard(Game& game) {
     board64Index = i ^ 56;
     boardIndex = constants::board64[board64Index];
 
-    std::byte& square{game.m_board[boardIndex]};
-    square = pieces::charToPiece(c);
+    Piece& square{game.m_board[boardIndex]};
+    square.setCode(c);
+    uint8_t pieceListIndex{};
     if (islower(c)) {
-      square |= pieces::BLACK;
-      game.m_blackList.append(boardIndex);
+      square.setColor(pieces::BLACK);
+      pieceListIndex = game.m_blackList.append(boardIndex);
+      std::cout << "Piece List index yo!:" << int(pieceListIndex) << '\n';
+      square.setPieceListIndex(pieceListIndex);
     } else {
-      game.m_whiteList.append(boardIndex);
+      pieceListIndex = game.m_whiteList.append(boardIndex);
+      std::cout << "Piece List index yo!:" << int(pieceListIndex) << '\n';
+      square.setPieceListIndex(pieceListIndex);
     }
     ++i;
   }

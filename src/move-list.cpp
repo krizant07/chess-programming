@@ -10,7 +10,7 @@ std::size_t MoveList::size() const {
 void MoveList::appendMove(std::byte piece, uint8_t initialSquare, int8_t offset, uint8_t flags) {
   m_list.emplace_back(static_cast<unsigned int>(initialSquare), static_cast<unsigned int>(initialSquare + offset),
                       static_cast<unsigned int>(flags), static_cast<unsigned int>(piece),
-                      static_cast<unsigned int>(constants::EMPTY_SQUARE));
+                      static_cast<unsigned int>(pieces::EMPTY));
 }
 
 void MoveList::appendCapture(std::byte piece, std::byte captured, uint8_t initialSquare, int8_t offset, uint8_t flags) {

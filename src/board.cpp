@@ -4,20 +4,22 @@
 #include "constants.h"
 
 Board::Board() {
+  for (auto& i : m_board)
+    i.setCode(pieces::SENTINAL);
   for (auto i : constants::board64)
-    m_board[i] = constants::EMPTY_SQUARE;
+    m_board[i].setCode(pieces::EMPTY);
 }
 
 bool Board::isPieceAtIndex(std::byte piece, uint8_t index) const {
-  return (m_board[index] & std::byte{0x07}) == (piece & std::byte{0x07});
+  return m_board[index].code() == (piece & std::byte{0x07});
 }
 
 bool Board::isColorAtIndex(std::byte color, uint8_t index) const {
-  return (m_board[index] & std::byte{0x80}) == color;
+  return m_board[index].color() == (color & std::byte{0x08});
 }
 
 bool Board::isPieceOfColorAtIndex(std::byte color, uint8_t index) const {
-  return (!isPieceAtIndex(constants::EMPTY_SQUARE, index) && !isPieceAtIndex(constants::SENTINAL, index) &&
+  return (!isPieceAtIndex(pieces::EMPTY, index) && !isPieceAtIndex(pieces::SENTINAL, index) &&
           isColorAtIndex(color, index));
 }
 
@@ -28,18 +30,18 @@ bool Board::isAtPawnHomeRankOfColor(std::byte color, uint8_t index) const {
     return (constants::board64[H6] < index) && (index < constants::board64[A8]);
 }
 
-std::byte& Board::operator[](uint8_t i) {
+Piece& Board::operator[](uint8_t i) {
   return m_board[i];
 }
 
 std::byte Board::at(uint8_t i) const {
-  return m_board[i];
+  return m_board[i].code();
 }
 
 void Board::debugPrint() const {
   for (int i{0}; i < m_board.size(); ++i) {
     if ((i % 10) == 0)
       std::cout << '\n';
-    pieces::print(m_board[i]);
+    m_board[i].print();
   }
 }

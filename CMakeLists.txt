@@ -14,6 +14,7 @@ set(SOURCES
     src/board.cpp
     src/fen-parser.cpp
     src/move-list.cpp
+    src/piece.cpp
 )
 
 add_executable(board ${SOURCES})

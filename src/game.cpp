@@ -62,17 +62,24 @@ void Game::makeMove(Move move) {
   uint8_t from{move.from()};
   uint8_t to{move.to()};
   uint8_t flags{move.flags()};
-  std::byte fromPiece{move.fromPiece()};
 
-  m_board[from] = constants::EMPTY_SQUARE;
-  list.move(from, to);
+  Piece& fromPiece{m_board[from]};
+  Piece& toPiece{m_board[to]};
 
+  std::cout << "hello im debugging like this again.\n";
+
+  list.move(fromPiece.pieceListIndex(), to);
+  std::cout << "0.5\n";
+  if (toPiece.code() != pieces::EMPTY) {
+    listRemoveHelper(enemyList, to);
+  }
+  std::cout << "1\n";
   m_board[to] = fromPiece;
-  enemyList.remove(to);
-
+  fromPiece.setCode(pieces::EMPTY);
+  std::cout << "2\n";
   m_whiteTurn = !m_whiteTurn;
 
-  if (fromPiece == pieces::PAWN) {
+  if (fromPiece.code() == pieces::PAWN) {
     m_halfMoveClock = 0;
   } else {
     ++m_halfMoveClock;
@@ -81,6 +88,7 @@ void Game::makeMove(Move move) {
   if (m_whiteTurn) { // Increment when it becomes whites turn
     ++m_fullMoveCount;
   }
+  std::cout << "3\n";
 
   if (flags == 1) { // double pawn push
     if (color == pieces::WHITE) {
@@ -95,31 +103,39 @@ void Game::makeMove(Move move) {
 
   if (flags & (1 << 1)) { // Castling
     if (flags & 1) { // Queenside
-      m_board[to + 1] = pieces::ROOK;
-      m_board[constants::board64[queenside]] = constants::EMPTY_SQUARE;
+      m_board[to + 1].setCode(pieces::ROOK);
+      m_board[to + 1].setColor(color);
+      m_board[constants::board64[queenside]].setCode(pieces::EMPTY);
       list.move(constants::board64[queenside], to + 1);
     } else { // Kingside
-      m_board[to - 1] = pieces::ROOK;
-      m_board[constants::board64[kingside]] = constants::EMPTY_SQUARE;
+      m_board[to - 1].setCode(pieces::ROOK);
+      m_board[to - 1].setColor(color);
+      m_board[constants::board64[kingside]].setCode(pieces::EMPTY);
       list.move(constants::board64[kingside], to - 1);
     }
     return;
   }
 
   if (flags & (1 << 3)) { // pawn promotion shite
-    m_board[to] = pieces::codeToPiece(flags & ((1 << 2) - 1));
+    m_board[to].setCode(flags & (0b0011));
+    m_board[to].setColor(color); // redundant i think?
     return;
   }
 
   if ((flags & (1 << 2)) && (flags & 1)) { // En passant capture
     if (color == pieces::WHITE) {
-      m_board[to - 10] = constants::EMPTY_SQUARE;
-      enemyList.remove(to - 10);
+      m_board[to - 10].setCode(pieces::EMPTY);
+      listRemoveHelper(enemyList, to - 10);
     } else {
-      m_board[to + 10] = constants::EMPTY_SQUARE;
-      enemyList.remove(to + 10);
+      m_board[to + 10].setCode(pieces::EMPTY);
+      listRemoveHelper(enemyList, to + 10);
     }
   }
+}
+
+void Game::listRemoveHelper(PieceList& list, uint8_t boardIndex) {
+  const Piece& piece{m_board[boardIndex]};
+  m_board[list.remove(piece.pieceListIndex())].setPieceListIndex(piece.pieceListIndex());
 }
 
 void Game::appendMoveHelper(MoveList& moves, uint8_t initialSquare, int8_t offset, uint8_t flags) const {
@@ -152,7 +168,7 @@ uint8_t Game::generatePseudoLegalPawnMoves(MoveList& moves, std::byte color, std
   int captureRightOffset{color == pieces::WHITE ? 9 : -9};
   if (m_board.isAtPawnHomeRankOfColor(enemy, initialSquare)) { // is promotable
 
-    if (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, initialSquare + frontOffset)) {
+    if (m_board.isPieceAtIndex(pieces::EMPTY, initialSquare + frontOffset)) {
       appendPawnPromotion(moves, initialSquare, frontOffset);
       count += 4;
     }
@@ -170,13 +186,13 @@ uint8_t Game::generatePseudoLegalPawnMoves(MoveList& moves, std::byte color, std
     return count; // There should be no more legal moves for a pawn if its promotable
   }
 
-  if (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, initialSquare + frontOffset)) {
+  if (m_board.isPieceAtIndex(pieces::EMPTY, initialSquare + frontOffset)) {
 
     moves.appendMove(pieces::PAWN, initialSquare, frontOffset);
     ++count;
 
     if ((m_board.isAtPawnHomeRankOfColor(color, initialSquare)) &&
-        (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, initialSquare + (frontOffset * 2)))) {
+        (m_board.isPieceAtIndex(pieces::EMPTY, initialSquare + (frontOffset * 2)))) {
       moves.appendMove(pieces::PAWN, initialSquare, frontOffset * 2, 0b0001);
       ++count;
     }
@@ -235,7 +251,7 @@ MoveList Game::generatePseudoLegal() {
   MoveList moves{};
   PieceList& list{m_whiteTurn ? m_whiteList : m_blackList};
   std::byte color{m_whiteTurn ? pieces::WHITE : pieces::BLACK};
-  std::byte enemy{color ^ std::byte{(1 << 7)}};
+  std::byte enemy{m_whiteTurn ? pieces::BLACK : pieces::WHITE};
   uint8_t count{};
 
   for (int i{0}; i < list.size(); ++i) {
@@ -255,10 +271,10 @@ MoveList Game::generatePseudoLegal() {
     for (int j{0}; j < pieces::offset_count[pieceInt]; ++j) {
       for (int moveOffset{pieces::offsets[pieceInt][j]}, move{initialSquare};;) {
         move += moveOffset;
-        if (m_board.isPieceAtIndex(constants::SENTINAL, move)) {
+        if (m_board.isPieceAtIndex(pieces::SENTINAL, move)) {
           break;
         }
-        if (m_board.isPieceAtIndex(constants::EMPTY_SQUARE, move)) {
+        if (m_board.isPieceAtIndex(pieces::EMPTY, move)) {
           appendMoveHelper(moves, initialSquare, moveOffset);
           ++count;
         } else {

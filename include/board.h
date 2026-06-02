@@ -13,12 +13,12 @@ public:
   bool isPieceOfColorAtIndex(std::byte, uint8_t) const;
   bool isAtPawnHomeRankOfColor(std::byte, uint8_t) const;
 
-  std::byte& operator[](uint8_t);
+  Piece& operator[](uint8_t);
 
   std::byte at(uint8_t) const;
 
   void debugPrint() const;
 
 private:
-  BoardArray m_board{constants::sentinal_board};
+  BoardArray m_board{};
 };

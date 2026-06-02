@@ -35,12 +35,11 @@
  *FF FF FF FF FF FF FF FF FF FF
  *FF FF FF FF FF FF FF FF FF FF
      a8                   h8
+
 */
 
 // clang-format off
 namespace constants {
-inline constexpr std::byte EMPTY_SQUARE { 0b0000'0110 };
-inline constexpr std::byte SENTINAL     { 0b1111'1111 };
 
 inline constexpr std::array<std::uint8_t, 64> board64 {
     21, 22, 23, 24, 25, 26, 27, 28,
@@ -53,29 +52,21 @@ inline constexpr std::array<std::uint8_t, 64> board64 {
     91, 92, 93, 94, 95, 96, 97, 98
 };
 // clang-format on
-
-inline constexpr BoardArray make_board(std::byte value) {
-  BoardArray a{};
-  for (auto& x : a)
-    x = value;
-  return a;
-}
-
-inline constexpr BoardArray sentinal_board{make_board(SENTINAL)};
 inline constexpr std::string_view startingFenString{"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"};
 }; // namespace constants
 
 namespace pieces {
-using Piece = std::byte;
 // clang-format off
-inline constexpr Piece KNIGHT { 0b0000'0000 };
-inline constexpr Piece BISHOP { 0b0000'0001 };
-inline constexpr Piece ROOK   { 0b0000'0010 };
-inline constexpr Piece QUEEN  { 0b0000'0011 };
-inline constexpr Piece KING   { 0b0000'0100 };
-inline constexpr Piece PAWN   { 0b0000'0101 };
-inline constexpr Piece WHITE  { 0b0000'0000 };
-inline constexpr Piece BLACK  { 0b1000'0000 };
+inline constexpr std::byte KNIGHT   { 0b0000 };
+inline constexpr std::byte BISHOP   { 0b0001 };
+inline constexpr std::byte ROOK     { 0b0010 };
+inline constexpr std::byte QUEEN    { 0b0011 };
+inline constexpr std::byte KING     { 0b0100 };
+inline constexpr std::byte PAWN     { 0b0101 };
+inline constexpr std::byte EMPTY    { 0b0110 };
+inline constexpr std::byte SENTINAL { 0b0111 };
+inline constexpr std::byte WHITE    { 0b0000 };
+inline constexpr std::byte BLACK    { 0b1000 };
 
 inline constexpr std::bitset<5> slide { 0b0'1110 }; // Knight doesnt slide, bishop/rook/queen do slide, king doesnt
 
@@ -90,10 +81,10 @@ inline constexpr std::array<std::array<int8_t, 8>, 5> offsets = {{
 }};
 // clang-format on
 
-inline void print(Piece piece) {
+inline void print(std::byte piece) {
   switch (piece) {
-  case constants::SENTINAL: std::cout << "FF "; break;
-  case constants::EMPTY_SQUARE: std::cout << "XX "; break;
+  case SENTINAL: std::cout << "FF "; break;
+  case EMPTY: std::cout << "XX "; break;
   // White Pieces
   case WHITE | PAWN: std::cout << "WP "; break;
   case WHITE | ROOK: std::cout << "WR "; break;
@@ -112,7 +103,7 @@ inline void print(Piece piece) {
   }
 }
 
-inline constexpr Piece charToPiece(char c) {
+inline constexpr std::byte charToPiece(char c) {
   switch (tolower(c)) {
   case 'p': return PAWN;
   case 'r': return ROOK;
@@ -120,19 +111,7 @@ inline constexpr Piece charToPiece(char c) {
   case 'b': return BISHOP;
   case 'q': return QUEEN;
   case 'k': return KING;
-  default: return constants::EMPTY_SQUARE;
-  }
-}
-
-inline constexpr Piece codeToPiece(uint8_t code) {
-  switch (static_cast<std::byte>((code & 0x07))) {
-  case (KNIGHT & std::byte{0x07}): return KNIGHT;
-  case (BISHOP & std::byte{0x07}): return BISHOP;
-  case (ROOK & std::byte{0x07}): return ROOK;
-  case (QUEEN & std::byte{0x07}): return QUEEN;
-  case (KING & std::byte{0x07}): return KING;
-  case (PAWN & std::byte{0x07}): return PAWN;
-  default: return constants::EMPTY_SQUARE;
+  default: return EMPTY;
   }
 }
 }; // namespace pieces
