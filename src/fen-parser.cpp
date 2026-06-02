@@ -45,11 +45,9 @@ void FenParser::populateBoard(Game& game) {
     if (islower(c)) {
       square.setColor(pieces::BLACK);
       pieceListIndex = game.m_blackList.append(boardIndex);
-      std::cout << "Piece List index yo!:" << int(pieceListIndex) << '\n';
       square.setPieceListIndex(pieceListIndex);
     } else {
       pieceListIndex = game.m_whiteList.append(boardIndex);
-      std::cout << "Piece List index yo!:" << int(pieceListIndex) << '\n';
       square.setPieceListIndex(pieceListIndex);
     }
     ++i;

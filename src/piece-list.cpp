@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "piece-list.h"
 
 PieceList::PieceList() {
@@ -18,8 +16,6 @@ uint8_t PieceList::remove(uint8_t index) {
 }
 
 void PieceList::move(uint8_t index, uint8_t to) {
-  std::cout << "yo.\n";
-  std::cout << "index: " << int(index) << '\n';
   m_pieceList[index] = to;
 }
 

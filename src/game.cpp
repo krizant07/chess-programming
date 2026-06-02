@@ -66,17 +66,6 @@ void Game::makeMove(Move move) {
   Piece& fromPiece{m_board[from]};
   Piece& toPiece{m_board[to]};
 
-  std::cout << "hello im debugging like this again.\n";
-
-  list.move(fromPiece.pieceListIndex(), to);
-  std::cout << "0.5\n";
-  if (toPiece.code() != pieces::EMPTY) {
-    listRemoveHelper(enemyList, to);
-  }
-  std::cout << "1\n";
-  m_board[to] = fromPiece;
-  fromPiece.setCode(pieces::EMPTY);
-  std::cout << "2\n";
   m_whiteTurn = !m_whiteTurn;
 
   if (fromPiece.code() == pieces::PAWN) {
@@ -88,7 +77,13 @@ void Game::makeMove(Move move) {
   if (m_whiteTurn) { // Increment when it becomes whites turn
     ++m_fullMoveCount;
   }
-  std::cout << "3\n";
+
+  list.move(fromPiece.pieceListIndex(), to);
+  if (toPiece.code() != pieces::EMPTY) {
+    listRemoveHelper(enemyList, to);
+  }
+  m_board[to] = fromPiece;
+  fromPiece.setCode(pieces::EMPTY);
 
   if (flags == 1) { // double pawn push
     if (color == pieces::WHITE) {
