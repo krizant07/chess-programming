@@ -1,11 +1,11 @@
 This highkey doesnt need a readme yet or probably ever.
 
-#Build steps:
+# Build steps:
 1. make sure ftxui is installed, or uncomment the fetch content in CMakeLists.txt
 2. build with CMake:
 `./build.sh`
 3. run:
 `./board`
 
-#Debug build/run
+# Debug build/run
 `./debug.sh`
