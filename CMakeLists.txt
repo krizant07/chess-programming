@@ -17,32 +17,18 @@ set(SOURCES
     src/piece.cpp
 )
 
-# Use if find_package doesnt work, or install ftxui to your system
-#include(FetchContent) 
-#
-#set(FETCHCONTENT_UPDATES_DISCONNECTED ON)
-#set(FETCHCONTENT_QUIET OFF)
-#
-#FetchContent_Declare(ftxui
-  #GIT_REPOSITORY https://github.com/arthursonzogni/ftxui.git
-  #GIT_TAG        v6.1.9
-  #GIT_PROGRESS   TRUE
-  #GIT_SHALLOW    TRUE
-  #  EXCLUDE_FROM_ALL
-  #)
-#
-#FetchContent_MakeAvailable(ftxui)
-
-find_package(ftxui REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(NOTCURSES REQUIRED notcurses)
 
 add_executable(board ${SOURCES})
 
-target_compile_options(board PRIVATE -Wall -Werror -pedantic-errors)
+target_compile_options(board PRIVATE -Wall -Werror -Wpedantic -pedantic-errors)
 
-target_include_directories(board PRIVATE include)
+target_include_directories(board PRIVATE 
+  include
+  ${NOTCURSES_INCLUDE_DIRS}
+)
 
 target_link_libraries(board PRIVATE
-  ftxui::screen
-  ftxui::dom
-  ftxui::component
+  ${NOTCURSES_LIBRARIES}
 )

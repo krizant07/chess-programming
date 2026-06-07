@@ -15,6 +15,8 @@ public:
   void makeMove(Move);
   void printMovesOfSquare(MoveList&, enum Square);
 
+  const Board& board() const;
+
   friend class FenParser;
 
 private:

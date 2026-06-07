@@ -124,17 +124,22 @@ void Game::makeMove(Move move) {
   }
 }
 
+const Board& Game::board() const {
+  return m_board;
+}
+
 void Game::listRemoveHelper(PieceList& list, uint8_t boardIndex) {
   const Piece& piece{m_board[boardIndex]};
   m_board[list.remove(piece.pieceListIndex())].setPieceListIndex(piece.pieceListIndex());
 }
 
 void Game::appendMoveHelper(MoveList& moves, uint8_t initialSquare, int8_t offset, uint8_t flags) const {
-  moves.appendMove(m_board.at(initialSquare), initialSquare, offset, flags);
+  moves.appendMove(m_board.at(initialSquare).code(), initialSquare, offset, flags);
 }
 
 void Game::appendCaptureHelper(MoveList& moves, uint8_t initialSquare, int8_t offset, uint8_t flags) const {
-  moves.appendCapture(m_board.at(initialSquare), m_board.at(initialSquare + offset), initialSquare, offset, flags);
+  moves.appendCapture(m_board.at(initialSquare).code(), m_board.at(initialSquare + offset).code(), initialSquare,
+                      offset, flags);
 }
 
 void Game::appendPawnPromotion(MoveList& moves, uint8_t from, int8_t offset) const {
@@ -252,7 +257,7 @@ MoveList Game::generatePseudoLegal() {
       assert(false && "Yo this should never happen yo");
     }
     uint8_t initialSquare{static_cast<uint8_t>(list[i])};
-    uint8_t pieceInt{static_cast<uint8_t>(m_board.at(initialSquare) & std::byte{0x07})};
+    uint8_t pieceInt{static_cast<uint8_t>(m_board.at(initialSquare).code() & std::byte{0x07})};
 
     if (m_board.isPieceAtIndex(pieces::PAWN, initialSquare)) {
       count = generatePseudoLegalPawnMoves(moves, color, enemy, initialSquare);

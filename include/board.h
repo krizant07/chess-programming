@@ -13,7 +13,7 @@ public:
 
   Piece& operator[](uint8_t);
 
-  std::byte at(uint8_t) const;
+  const Piece& at(uint8_t) const;
 
   void debugPrint() const;
 

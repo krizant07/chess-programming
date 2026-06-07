@@ -5,39 +5,8 @@
 #include <string_view>
 
 #include "types.h"
-
-/*
- * bit 7
- * WHITE  0
- * BLACK  1
- *
- * bit 0-2
- * KNIGHT            000
- * BISHOP            001
- * ROOK              010
- * QUEEN             011
- * KING              100
- * PAWN              101
- * EMPTY_SQUARE      110
- * SENTINAL & 0x07   111
- *
- *FF FF FF FF FF FF FF FF FF FF
- *FF FF FF FF FF FF FF FF FF FF
- *FF 02 03 04 05 06 04 03 02 FF h1
- *FF 01 01 01 01 01 01 01 01 FF
- *FF XX XX XX XX XX XX XX XX FF
- *FF XX XX XX XX XX XX XX XX FF
- *FF XX XX XX XX XX XX XX XX FF
- *FF XX XX XX XX XX XX XX XX FF
- *FF 81 81 81 81 81 81 81 81 FF
- *FF 82 83 84 85 86 84 83 82 FF h8
- *FF FF FF FF FF FF FF FF FF FF
- *FF FF FF FF FF FF FF FF FF FF
-     a8                   h8
-
-*/
-
 // clang-format off
+
 namespace constants {
 
 inline constexpr std::array<std::uint8_t, 64> board64 {
@@ -77,6 +46,33 @@ inline constexpr std::array<std::array<int8_t, 8>, 5> offsets = {{
     { -10,  -1,  1, 10, 0,  0,  0,  0 }, /* ROOK */
     { -11, -10, -9, -1, 1,  9, 10, 11 }, /* QUEEN */
     { -11, -10, -9, -1, 1,  9, 10, 11 }  /* KING */
+}};
+
+inline constexpr std::array<std::array<std::string_view, 3>, 8> pieceASCII {{
+{" (\"\\ ",
+ " )#\' ",
+ "/###\\"},
+{" (V) ",
+ " )#( ",
+ "/###\\"},
+{" [-] ",
+ " |#| ",
+ "/###\\"},
+{" \\^/ ",
+  " )#( ",
+  "/###\\"},
+{" \\+/ ",
+  " )#( ",
+  "/###\\"},
+{"  _  ",
+ " (#) ",
+ "/###\\"},
+{"     ",
+ "     ",
+ "     "},
+{"XXXXX",
+ "XXXXX",
+ "XXXXX"}
 }};
 // clang-format on
 }; // namespace pieces

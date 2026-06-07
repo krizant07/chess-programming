@@ -1,5 +1,5 @@
 # Build steps:
-1. make sure ftxui is installed, or uncomment the fetch content in CMakeLists.txt
+1. make sure notcurses is installed on your **linux** machine
 2. build with CMake:
 `./build.sh`
 3. run:

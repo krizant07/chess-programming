@@ -34,8 +34,8 @@ Piece& Board::operator[](uint8_t i) {
   return m_board[i];
 }
 
-std::byte Board::at(uint8_t i) const {
-  return m_board[i].code();
+const Piece& Board::at(uint8_t i) const {
+  return m_board[i];
 }
 
 void Board::debugPrint() const {
