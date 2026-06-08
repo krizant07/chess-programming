@@ -128,6 +128,18 @@ const Board& Game::board() const {
   return m_board;
 }
 
+bool Game::whiteTurn() const {
+  return m_whiteTurn;
+}
+
+const PieceList& Game::whiteList() const {
+  return m_whiteList;
+}
+
+const PieceList& Game::blackList() const {
+  return m_blackList;
+}
+
 void Game::listRemoveHelper(PieceList& list, uint8_t boardIndex) {
   const Piece& piece{m_board[boardIndex]};
   m_board[list.remove(piece.pieceListIndex())].setPieceListIndex(piece.pieceListIndex());

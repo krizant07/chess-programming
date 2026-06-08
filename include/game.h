@@ -16,6 +16,9 @@ public:
   void printMovesOfSquare(MoveList&, enum Square);
 
   const Board& board() const;
+  bool whiteTurn() const;
+  const PieceList& whiteList() const;
+  const PieceList& blackList() const;
 
   friend class FenParser;
 

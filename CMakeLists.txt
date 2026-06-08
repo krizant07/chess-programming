@@ -15,6 +15,8 @@ set(SOURCES
     src/fen-parser.cpp
     src/move-list.cpp
     src/piece.cpp
+    src/application.cpp
+    src/rendering/board-renderer.cpp
 )
 
 find_package(PkgConfig REQUIRED)
