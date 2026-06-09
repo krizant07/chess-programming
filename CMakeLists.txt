@@ -17,6 +17,9 @@ set(SOURCES
     src/piece.cpp
     src/application.cpp
     src/rendering/board-renderer.cpp
+    src/rendering/game-renderer.cpp
+    src/rendering/menu.cpp
+    src/rendering/plane.cpp
 )
 
 find_package(PkgConfig REQUIRED)

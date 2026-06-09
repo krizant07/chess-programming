@@ -5,7 +5,7 @@
 #include "game.h"
 #include "move-list.h"
 
-Game::Game() {}
+Game::Game() = default;
 
 MoveList Game::debugPrint() {
   std::cout << "Game Debug:";

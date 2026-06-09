@@ -2,6 +2,7 @@
 
 #include "board.h"
 #include "constants.h"
+#include "types.h"
 
 Board::Board() {
   for (auto& i : m_board)

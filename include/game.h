@@ -5,6 +5,7 @@
 #include "board.h"
 #include "move-list.h"
 #include "piece-list.h"
+#include "types.h"
 
 class Game {
 public:

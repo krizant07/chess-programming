@@ -1,10 +1,9 @@
 #pragma once
-
+#include <array>
 #include <bitset>
 #include <cstdint>
 #include <string_view>
 
-#include "types.h"
 // clang-format off
 
 namespace constants {

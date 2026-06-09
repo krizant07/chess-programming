@@ -1,11 +1,12 @@
 #pragma once
 
 #include "fen-parser.h"
-#include "game.h"
-
-#include <notcurses/notcurses.h>
+#include "rendering/game-renderer.h"
+#include "rendering/menu.h"
 
 class Application {
+  enum Mode { menu, game, settings, max_mode };
+
 public:
   Application();
   ~Application();
@@ -20,10 +21,16 @@ private:
     parser.setup(game, fenStr);
     return game;
   }
+
   notcurses* m_notCurses{};
   ncplane* m_stdPlane{};
   ncinput m_notCursesInput{};
   timespec m_timeSpec{};
-  int m_height{};
-  int m_width{};
+
+  Mode m_mode{};
+
+  Game m_game{};
+
+  Menu m_menu{};
+  GameRenderer m_gameRenderer{};
 };

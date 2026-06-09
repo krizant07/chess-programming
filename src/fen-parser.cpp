@@ -1,6 +1,7 @@
 #include <cassert>
 #include <iostream>
 
+#include "constants.h"
 #include "fen-parser.h"
 
 std::ostream& operator<<(std::ostream& os, std::byte b) {

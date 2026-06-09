@@ -1,17 +1,21 @@
 #include "rendering/board-renderer.h"
+#include "constants.h"
 
-BoardRenderer::BoardRenderer(ncplane* parent, int parentHeight, int parentWidth)
+BoardRenderer::BoardRenderer() = default;
+
+BoardRenderer::BoardRenderer(ncplane* parent)
     : m_squareHeight{4}, m_squareWidth{9}, m_squareSelected{0},
       m_lightSquareChannel{(162u << 16u) + (205u << 8u) + 90u},
       m_darkSquareChannel{(255u << 16u) + (231u << 8u) + 186u} {
   int boardHeight{m_squareHeight * 8};
   int boardWidth{m_squareWidth * 8};
 // clang-format off
-  ncplane_options board_opts{(parentHeight - boardHeight) / 2,
-                             (parentWidth - boardWidth) / 2,
+  ncplane_options board_opts{(static_cast<int>(ncplane_dim_y(parent)) - boardHeight) / 2,
+                             (static_cast<int>(ncplane_dim_x(parent)) - boardWidth) / 2,
                              static_cast<unsigned int>(boardHeight),
                              static_cast<unsigned int>(boardWidth),
                              nullptr, nullptr, nullptr, 0, 0, 0};
+
   m_plane = ncplane_create(parent, &board_opts);
 
   ncplane_options square_opts{0, 0,
@@ -34,14 +38,13 @@ void BoardRenderer::render(bool whitePerspective, const PieceList& whiteList, co
 
 void BoardRenderer::renderSquares(bool whitePerspective) {
   uint32_t lightDarkXor{m_darkSquareChannel ^ m_lightSquareChannel};
-  uint32_t squareChannel = whitePerspective ? m_darkSquareChannel : m_lightSquareChannel;
+  [[maybe_unused]] uint32_t squareChannel{whitePerspective ? m_darkSquareChannel : m_lightSquareChannel};
 
   for (std::size_t i{0}; i < m_squarePlanes.size(); ++i) {
     if (i % 8 == 0)
       squareChannel ^= lightDarkXor;
 
     ncplane_set_bg_rgb(m_squarePlanes[i], squareChannel);
-
     for (int j{0}; j < m_squareHeight; ++j) {
       ncplane_putstr_yx(m_squarePlanes[i], j, 0, "         ");
     }

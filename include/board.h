@@ -1,6 +1,8 @@
 #pragma once
 
-#include "constants.h"
+#include <array>
+
+#include "piece.h"
 
 class Board {
 public:
@@ -18,5 +20,5 @@ public:
   void debugPrint() const;
 
 private:
-  BoardArray m_board{};
+  std::array<Piece, 120> m_board{};
 };
