@@ -11,6 +11,9 @@ public:
   Application();
   ~Application();
 
+  void render();
+  void handleInput();
+
   void run();
 
 private:
@@ -28,9 +31,10 @@ private:
   timespec m_timeSpec{};
 
   Mode m_mode{};
-
-  Game m_game{};
+  bool m_running{};
 
   Menu m_menu{};
   GameRenderer m_gameRenderer{};
+
+  Game m_game{};
 };
