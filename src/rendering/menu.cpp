@@ -28,10 +28,15 @@ void Menu::render() {
   for (; i < menuStrings::splashText.size(); ++i) {
     ncplane_putstr_yx(m_plane, i + 2, 4, menuStrings::splashText[i].data());
   }
+  std::size_t y{};
   for (std::size_t j{0}; j < menuStrings::menuItem::max_item; ++j) {
-    if (m_selection == j)
-      ncplane_set_bg_rgb8(m_plane, 255, 255, 255);
-    ncplane_putstr_yx(m_plane, (j * 3) + i + 6, 4, menuStrings::menuItems[j].data());
-    ncplane_set_bg_default(m_plane);
+    y = (j * 3) + i + 6;
+    if (m_selection == j) {
+      ncplane_putstr_yx(m_plane, y, 4, "> ");
+      ncplane_putstr_yx(m_plane, y, 6, menuStrings::menuItems[j].data());
+      continue;
+    }
+    ncplane_putstr_yx(m_plane, y, 4, menuStrings::menuItems[j].data());
+    ncplane_putstr_yx(m_plane, y, 4 + menuStrings::menuItems[j].size(), "  ");
   }
 }

@@ -6,8 +6,8 @@
 class GameRenderer : public Plane {
 public:
   GameRenderer();
-  GameRenderer(ncplane*);
-  void render(const Game&);
+  GameRenderer(ncplane*, const Game&);
+  void render();
   void handleInput(const ncinput&, Game&);
 
 private:

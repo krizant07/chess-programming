@@ -12,7 +12,6 @@ Application::Application() {
   m_mode = Mode::menu;
 
   m_menu = Menu(m_stdPlane);
-  m_gameRenderer = GameRenderer(m_stdPlane);
 
   m_menu.show();
   m_menu.top();
@@ -23,9 +22,10 @@ Application::~Application() {
 }
 
 void Application::render() {
+  ncplane_putstr_yx(m_stdPlane, 0, 0, "Press CTRL+Q to quit at anytime");
   switch (m_mode) {
   case menu: m_menu.render(); break;
-  case game: m_gameRenderer.render(m_game); break;
+  case game: m_gameRenderer.render(); break;
   case settings: break;
   default: assert(false && "NO!!!!");
   }
@@ -55,21 +55,30 @@ void Application::handleInput() {
     if (id == NCKEY_ENTER) {
       using enum menuStrings::menuItem;
       switch (m_menu.selection()) {
-      case play: break;
+      case play:
+        m_game = buildGame(constants::startingFenString);
+        m_gameRenderer = GameRenderer(m_stdPlane, m_game);
+        m_gameRenderer.show();
+        m_gameRenderer.top();
+        m_menu.hide();
+        m_mode = game;
+        break;
       case settings: break;
       case quit: m_running = false; break;
       default: assert(false && "NO!!!!");
       }
     }
     break;
-  case game: break;
+  case game:
+    if (ncinput_shift_p(&m_notCursesInput)) { // Shift + Q to go back get a "do you want to go back to menu?"
+    }
+    m_gameRenderer.handleInput(m_notCursesInput, m_game);
+    break;
   default: assert(false && "NO!!!!");
   }
 }
 
 void Application::run() {
-  m_game = buildGame(constants::startingFenString);
-
   while (m_running) {
     if (notcurses_get(m_notCurses, &m_timeSpec, &m_notCursesInput)) {
       handleInput();
