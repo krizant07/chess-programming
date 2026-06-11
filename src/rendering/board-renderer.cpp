@@ -26,6 +26,7 @@ BoardRenderer::BoardRenderer(ncplane* parent, bool whitePerspective, const Piece
 
 void BoardRenderer::render(const PieceList& whiteList, const PieceList& blackList, const Board& board) {
   renderSquares();
+  renderSelector();
   renderPieces(whiteList, blackList, board);
 }
 
@@ -61,20 +62,23 @@ void BoardRenderer::renderList(const PieceList& pieceList, const Board& board, u
   for (std::size_t i{0}; i < pieceList.size(); ++i) {
     unsigned int boardIndex{static_cast<unsigned int>(constants::board120[pieceList[i]])};
     unsigned int boardIndexXor{boardIndex ^ m_xorValue};
+    unsigned int y{boardIndexXor / 8};
+    unsigned int x{boardIndexXor % 8};
 // clang-format off
     ncplane_options piece_opts{
-        static_cast<int>(((boardIndexXor / 8) * m_squareHeight) + (((m_squareHeight - asciiHeight) + 2 - 1) / 2)),
-        static_cast<int>(((boardIndexXor % 8) * m_squareWidth) + (((m_squareWidth - asciiWidth) + 2 - 1) / 2)),
+        static_cast<int>((y * m_squareHeight) + (((m_squareHeight - asciiHeight) + 2 - 1) / 2)),
+        static_cast<int>((x * m_squareWidth) + (((m_squareWidth - asciiWidth) + 2 - 1) / 2)),
         asciiHeight, asciiWidth, nullptr, nullptr, nullptr, 0, 0, 0};
 // clang-format on
     ncplane* plane{ncplane_create(m_plane, &piece_opts)};
     uint8_t code{static_cast<uint8_t>(board.at(pieceList[i]).code())};
-    ncplane_set_bg_alpha(plane, NCALPHA_TRANSPARENT);
+    uint64_t channels{};
+    ncchannels_set_bg_alpha(&channels, NCALPHA_TRANSPARENT);
+    ncplane_set_base(plane, " ", 0, channels);
     for (std::size_t j{0}; j < asciiHeight; ++j) {
       ncplane_set_fg_rgb(plane, outlineColor);
       for (std::size_t k{0}; k < asciiWidth; ++k) {
         if (pieces::pieceASCII[code][j][k] == ' ') {
-          ncplane_putchar_yx(plane, j, k, ' ');
           continue;
         }
         if (k + 1 == asciiWidth) {
@@ -87,8 +91,33 @@ void BoardRenderer::renderList(const PieceList& pieceList, const Board& board, u
       }
     }
     m_pieces.push_back(plane);
-    m_pieceIndices[boardIndex] = i;
   }
 }
 
-void BoardRenderer::renderSelection() {}
+void BoardRenderer::renderSelector() {
+  unsigned int boardIndex{m_whitePerspective ? constants::E1 : constants::E8};
+  unsigned int boardIndexXor{boardIndex ^ m_xorValue};
+  unsigned int y{boardIndexXor / 8};
+  unsigned int x{boardIndexXor % 8};
+// clang-format off
+  ncplane_options board_opts{static_cast<int>(m_squareHeight * y),
+                             static_cast<int>(m_squareWidth * x),
+                             static_cast<unsigned int>(m_squareHeight),
+                             static_cast<unsigned int>(m_squareWidth),
+                             nullptr,nullptr,nullptr,0,0,0};
+// clang-format on
+  m_selector = ncplane_create(m_plane, &board_opts);
+  uint64_t channels{};
+  ncchannels_set_bg_alpha(&channels, NCALPHA_TRANSPARENT);
+  ncchannels_set_fg_alpha(&channels, NCALPHA_TRANSPARENT);
+  ncplane_set_base(m_selector, " ", 0, channels);
+
+  ncplane_set_fg_rgb8(m_selector, 255, 0, 0);
+
+  for (int i{0}; i < m_squareHeight; ++i) {
+    ncplane_putchar_yx(m_selector, i, 0, '*');
+    ncplane_putchar_yx(m_selector, i, m_squareWidth - 1, '*');
+  }
+  ncplane_putstr_yx(m_selector, 0, 1, "*******"); // 7 wide bc 9-2=7 (this is dumb to hardcode)
+  ncplane_putstr_yx(m_selector, m_squareHeight - 1, 1, "*******");
+}

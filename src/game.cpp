@@ -29,7 +29,7 @@ MoveList Game::debugPrint() {
   return moveList;
 }
 
-void Game::printMovesOfSquare(MoveList& moveList, enum Square sq) {
+void Game::printMovesOfSquare(MoveList& moveList, enum constants::Square sq) {
   Piece& piece{m_board[constants::board64[sq]]};
   PieceList& pieceList{piece.color() == pieces::WHITE ? m_whiteList : m_blackList};
   uint8_t pieceListIndex{piece.pieceListIndex()};
@@ -47,8 +47,8 @@ void Game::printMovesOfSquare(MoveList& moveList, enum Square sq) {
 
 void Game::makeMove(Move move) {
   std::byte color{m_whiteTurn ? pieces::WHITE : pieces::BLACK};
-  Square kingside{m_whiteTurn ? H1 : H8};
-  Square queenside{m_whiteTurn ? A1 : A8};
+  constants::Square kingside{m_whiteTurn ? constants::H1 : constants::H8};
+  constants::Square queenside{m_whiteTurn ? constants::A1 : constants::A8};
   PieceList& list = m_whiteTurn ? m_whiteList : m_blackList;
   PieceList& enemyList = m_whiteTurn ? m_blackList : m_whiteList;
 
@@ -235,19 +235,19 @@ uint8_t Game::generatePseudoLegalPawnMoves(MoveList& moves, std::byte color, std
 }
 
 uint8_t Game::handleCastleGeneration(MoveList& moves, uint8_t rookPosition, uint8_t kingPosition) const {
-  if (kingPosition == constants::board64[E1]) {
-    if (rookPosition == constants::board64[H1] && m_canCastleKQkq[0]) {
+  if (kingPosition == constants::board64[constants::E1]) {
+    if (rookPosition == constants::board64[constants::H1] && m_canCastleKQkq[0]) {
       moves.appendMove(pieces::KING, constants::board64[kingPosition], 2, 0b0010);
       return 1;
-    } else if (rookPosition == constants::board64[A1] && m_canCastleKQkq[1]) {
+    } else if (rookPosition == constants::board64[constants::A1] && m_canCastleKQkq[1]) {
       moves.appendMove(pieces::KING, constants::board64[kingPosition], -2, 0b0011);
       return 1;
     }
-  } else if (kingPosition == constants::board64[E8]) {
-    if (rookPosition == constants::board64[H8] && m_canCastleKQkq[2]) {
+  } else if (kingPosition == constants::board64[constants::E8]) {
+    if (rookPosition == constants::board64[constants::H8] && m_canCastleKQkq[2]) {
       moves.appendMove(pieces::KING, constants::board64[kingPosition], 2, 0b0010);
       return 1;
-    } else if (rookPosition == constants::board64[A8] && m_canCastleKQkq[3]) {
+    } else if (rookPosition == constants::board64[constants::A8] && m_canCastleKQkq[3]) {
       moves.appendMove(pieces::KING, constants::board64[kingPosition], -2, 0b0011);
       return 1;
     }

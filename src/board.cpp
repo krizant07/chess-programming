@@ -2,7 +2,6 @@
 
 #include "board.h"
 #include "constants.h"
-#include "types.h"
 
 Board::Board() {
   for (auto& i : m_board)
@@ -26,9 +25,9 @@ bool Board::isPieceOfColorAtIndex(std::byte color, uint8_t index) const {
 
 bool Board::isAtPawnHomeRankOfColor(std::byte color, uint8_t index) const {
   if (color == pieces::WHITE)
-    return (constants::board64[H1] < index) && (index < constants::board64[A3]);
+    return (constants::board64[constants::H1] < index) && (index < constants::board64[constants::A3]);
   else
-    return (constants::board64[H6] < index) && (index < constants::board64[A8]);
+    return (constants::board64[constants::H6] < index) && (index < constants::board64[constants::A8]);
 }
 
 Piece& Board::operator[](uint8_t i) {

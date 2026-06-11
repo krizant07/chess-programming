@@ -3,9 +3,9 @@
 #include <bitset>
 
 #include "board.h"
+#include "constants.h"
 #include "move-list.h"
 #include "piece-list.h"
-#include "types.h"
 
 class Game {
 public:
@@ -14,7 +14,7 @@ public:
   MoveList debugPrint();
 
   void makeMove(Move);
-  void printMovesOfSquare(MoveList&, enum Square);
+  void printMovesOfSquare(MoveList&, enum constants::Square);
 
   const Board& board() const;
   bool whiteTurn() const;

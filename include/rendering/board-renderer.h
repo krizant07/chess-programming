@@ -16,7 +16,7 @@ private:
   void renderSquares();
   void renderPieces(const PieceList&, const PieceList&, const Board&);
   void renderList(const PieceList&, const Board&, uint32_t, uint32_t);
-  void renderSelection();
+  void renderSelector();
 
   int m_squareHeight{};
   int m_squareWidth{};
@@ -24,9 +24,9 @@ private:
   uint32_t m_lightSquareChannel{};
   uint32_t m_darkSquareChannel{};
   unsigned int m_xorValue{};
-  std::vector<ncplane*> m_pieces{};
-  std::array<int8_t, 64> m_pieceIndices{};
-
   int m_squareSelected{};
   bool m_selected{};
+
+  std::vector<ncplane*> m_pieces{};
+  ncplane* m_selector{};
 };
